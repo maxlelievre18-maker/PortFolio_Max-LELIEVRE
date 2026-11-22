@@ -637,6 +637,13 @@ code {
   }
 }
 
+.video-source-options { display:grid; gap:10px; margin-bottom:10px; }
+.video-source-choice { display:grid; gap:6px; color:var(--muted); font-size:9px; }
+.video-source-choice select { min-height:36px; padding:0 10px; border:1px solid var(--line); background:#091923; color:var(--pale); font:inherit; font-size:11px; }
+.youtube-source-panel { display:grid; gap:8px; }
+.youtube-input-preview iframe { display:block; width:min(100%,320px); aspect-ratio:16 / 9; border:1px solid var(--line); background:#000; }
+.media-preview iframe { width:96px; height:54px; border:1px solid var(--line); background:#000; }
+
 :root {
   --admin-select:#091923
 }

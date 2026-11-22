@@ -1,4 +1,4 @@
-/* Fichier g?n?r? depuis data/portfolio.json avec project_manager.mjs. */
+/* Fichier généré depuis data/portfolio.json avec project_manager.mjs. */
 window.SITE = {
   "name": "Max Lelièvre",
   "location": "Nantes / Paris - FRANCE",
@@ -265,11 +265,13 @@ window.PROJECTS = [
     ],
     "videos": [
       {
-        "type": "file",
-        "src": "assets/videos/projects/almd/project.mp4",
+        "type": "youtube",
+        "src": "https://youtu.be/qViv2PUKhwQ",
+        "videoId": "qViv2PUKhwQ",
+        "mediaCategory": "film",
         "title": {
-          "fr": "Extrait du projet",
-          "en": "Project excerpt"
+          "fr": "Extrait YouTube du projet",
+          "en": "YouTube project excerpt"
         }
       }
     ],

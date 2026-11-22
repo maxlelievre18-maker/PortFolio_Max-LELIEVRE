@@ -26,6 +26,40 @@
     if (typeof value === "string") return value;
     return value[lang] || value.fr || value.en || "";
   }
+  function youtubeVideoId(value) {
+    try {
+      const url = new URL(String(value || "").trim());
+      if (url.protocol !== "https:" && url.protocol !== "http:") return "";
+      const host = url.hostname.toLowerCase().replace(/^(www|m)\./, "");
+      let id = "";
+      if (host === "youtu.be") id = url.pathname.split("/").filter(Boolean)[0] || "";
+      else if (host === "youtube.com" || host === "youtube-nocookie.com") {
+        if (url.pathname === "/watch") id = url.searchParams.get("v") || "";
+        else id = url.pathname.match(/^\/(?:shorts|embed|live)\/([^/?]+)/)?.[1] || "";
+      } else return "";
+      return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+    } catch { return ""; }
+  }
+  function previewYouTube(container, id) {
+    if (!container) return;
+    container.replaceChildren();
+    if (!id) return;
+    const frame = document.createElement("iframe");
+    frame.src = "https://www.youtube-nocookie.com/embed/" + id;
+    frame.title = "Aperçu YouTube";
+    frame.loading = "lazy";
+    frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = "strict-origin-when-cross-origin";
+    container.appendChild(frame);
+  }
+  function setVideoSourceMode(type) {
+    const mode = $('[data-video-mode="' + type + '"]', mediaGrid)?.value || "file";
+    const filePanel = $('[data-video-file-panel="' + type + '"]', mediaGrid);
+    const youtubePanel = $('[data-video-youtube-panel="' + type + '"]', mediaGrid);
+    if (filePanel) filePanel.hidden = mode !== "file";
+    if (youtubePanel) youtubePanel.hidden = mode !== "youtube";
+  }
   function flash(message, error = false) {
     notice.textContent = message;
     notice.hidden = false;
@@ -183,15 +217,20 @@
     return project;
   }
   function mediaPath(item) { return item?.src || item || ""; }
-  function addPreview(container, path, video = false, captionTarget = null) {
+  function addPreview(container, path, video = false, captionTarget = null, videoId = "") {
     if (!path) return;
     const item = document.createElement("div");
     item.className = "media-preview-item";
     item.dataset.mediaPath = path;
-    const element = document.createElement(video ? "video" : "img");
-    element.src = "/" + path;
-    if (video) { element.controls = true; element.muted = true; }
-    else element.alt = "Aperçu du média";
+    const element = document.createElement(videoId ? "iframe" : video ? "video" : "img");
+    if (videoId) {
+      element.src = "https://www.youtube-nocookie.com/embed/" + videoId;
+      element.title = "Aperçu YouTube";
+      element.allowFullscreen = true;
+      element.loading = "lazy";
+    } else element.src = "/" + path;
+    if (video && !videoId) { element.controls = true; element.muted = true; }
+    else if (!video) element.alt = "Aperçu du média";
     item.appendChild(element);
     if (captionTarget) {
       item.dataset.captionKind = captionTarget.kind;
@@ -203,6 +242,7 @@
   }
   function refreshPreviews(project = state.data.PROJECTS.find(item => item.id === state.currentId)) {
     $$('[data-preview]').forEach(node => { node.replaceChildren(); });
+    $$('[data-youtube-preview]').forEach(node => { node.replaceChildren(); });
     $$('[data-media-result]').forEach(node => { node.textContent = node.dataset.mediaResult + " · aucun fichier ajouté"; });
     if (!project) return;
     addPreview($('[data-preview="cover"]'), project.thumbnail, false, { kind: "cover", caption: project.thumbnailCaption });
@@ -218,13 +258,24 @@
     const videoGroups = {};
     ["still", "technical", "workflow", "bts"].forEach(key => {
       videoGroups[key] = videos.filter(item => item.mediaCategory === key || (!item.mediaCategory && new RegExp((key === "technical" ? "capture" : key) + "-").test(item.src || "")));
-      videoGroups[key].slice(-4).forEach(item => addPreview($('[data-preview="' + key + '"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
+      videoGroups[key].slice(-4).forEach(item => addPreview($('[data-preview="' + key + '"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }, item.videoId));
     });
     const comparisons = project.comparisons || [];
     comparisons.forEach((item, index) => { addPreview($('[data-preview="comparison"]'), item.before, false, { kind: "comparison-before", index, caption: item.beforeCaption }); addPreview($('[data-preview="comparison"]'), item.after, false, { kind: "comparison-after", index, caption: item.afterCaption }); });
-    videos.filter(item => /breakdown-/.test(item.src || "")).slice(-3).forEach(item => addPreview($('[data-preview="breakdown"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
-    videos.filter(item => /project\./.test(item.src || "")).slice(-1).forEach(item => addPreview($('[data-preview="film"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
-    const counts = { cover: project.thumbnail ? 1 : 0, still: groups.still.length + videoGroups.still.length, technical: groups.technical.length + videoGroups.technical.length, workflow: groups.workflow.length + videoGroups.workflow.length, bts: groups.bts.length + videoGroups.bts.length, comparison: comparisons.filter(item => item.before && item.after).length, breakdown: videos.filter(item => /breakdown-/.test(item.src || "")).length, film: videos.filter(item => /project\./.test(item.src || "")).length };
+    const breakdownVideos = videos.filter(item => item.mediaCategory === "breakdown" || /breakdown-/.test(item.src || ""));
+    const filmVideos = videos.filter(item => item.mediaCategory === "film" || /project\./.test(item.src || ""));
+    breakdownVideos.slice(-3).forEach(item => addPreview($('[data-preview="breakdown"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }, item.videoId));
+    filmVideos.slice(-1).forEach(item => addPreview($('[data-preview="film"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }, item.videoId));
+    ["film", "breakdown"].forEach(type => {
+      const youtubeItem = videos.find(item => item.mediaCategory === type && item.videoId);
+      const input = $('[data-youtube-url="' + type + '"]', mediaGrid);
+      const mode = $('[data-video-mode="' + type + '"]', mediaGrid);
+      if (input) input.value = youtubeItem?.src || "";
+      if (mode) mode.value = youtubeItem ? "youtube" : "file";
+      setVideoSourceMode(type);
+      previewYouTube($('[data-youtube-preview="' + type + '"]', mediaGrid), youtubeItem?.videoId);
+    });
+    const counts = { cover: project.thumbnail ? 1 : 0, still: groups.still.length + videoGroups.still.length, technical: groups.technical.length + videoGroups.technical.length, workflow: groups.workflow.length + videoGroups.workflow.length, bts: groups.bts.length + videoGroups.bts.length, comparison: comparisons.filter(item => item.before && item.after).length, breakdown: breakdownVideos.length, film: filmVideos.length };
     Object.entries(counts).forEach(([key, count]) => { const node = $('[data-media-result="' + key + '"]'); if (node && count) node.textContent = count + (count > 1 ? " fichier(s) ajouté(s)" : " fichier ajouté"); });
   }
   function setSiteForm() {
@@ -363,10 +414,35 @@
     } else if (type === "breakdown" || type === "film") {
       project.videos ||= [];
       const label = type === "breakdown" ? { fr: "Breakdown VFX", en: "VFX breakdown" } : { fr: "Extrait du projet", en: "Project excerpt" };
-      project.videos.push({ type: "file", src: result.path, title: label });
+      project.videos.push({ type: "file", src: result.path, title: label, mediaCategory: type });
     }
     await request("/api/save", state.data);
     return result;
+  }
+  async function saveYouTubeLink(type) {
+    const input = $('[data-youtube-url="' + type + '"]', mediaGrid);
+    const src = input?.value.trim() || "";
+    const videoId = youtubeVideoId(src);
+    if (!videoId) {
+      flash("Lien YouTube invalide. Utilise une URL youtube.com, youtu.be ou un lien Shorts.", true);
+      input?.focus();
+      return;
+    }
+    try {
+      const project = await saveProject(false);
+      if (!project) return;
+      project.videos ||= [];
+      const labels = type === "film"
+        ? { fr: "Extrait YouTube du projet", en: "YouTube project excerpt" }
+        : { fr: "Breakdown YouTube", en: "YouTube breakdown" };
+      const entry = { type: "youtube", src, videoId, mediaCategory: type, title: labels };
+      const index = project.videos.findIndex(item => item.type === "youtube" && item.mediaCategory === type);
+      if (index >= 0) project.videos[index] = { ...project.videos[index], ...entry };
+      else project.videos.push(entry);
+      await request("/api/save", state.data);
+      refreshPreviews(project);
+      flash("Lien YouTube enregistré dans le projet.");
+    } catch (error) { flash(error.message, true); }
   }
 
   list.addEventListener("click", event => {
@@ -382,7 +458,18 @@
     const id = form.elements.namedItem("id").value;
     if (id) window.open(new URL("/#/project/" + encodeURIComponent(id), window.location.href).href, "_blank", "noopener,noreferrer");
   });
+  if (mediaGrid) mediaGrid.addEventListener("change", event => {
+    const select = event.target.closest("[data-video-mode]");
+    if (select) setVideoSourceMode(select.dataset.videoMode);
+  });
+  if (mediaGrid) mediaGrid.addEventListener("input", event => {
+    const input = event.target.closest("[data-youtube-url]");
+    if (!input) return;
+    previewYouTube($('[data-youtube-preview="' + input.dataset.youtubeUrl + '"]', mediaGrid), youtubeVideoId(input.value));
+  });
   if (mediaGrid) mediaGrid.addEventListener("click", async event => {
+    const youtubeButton = event.target.closest("[data-youtube-save]");
+    if (youtubeButton) { await saveYouTubeLink(youtubeButton.dataset.youtubeSave); return; }
     const row = event.target.closest("[data-caption-kind]");
     if (!row) return;
     const fields = row.querySelector("[data-caption-fields]");
@@ -406,7 +493,7 @@
       } else if (row.dataset.captionKind === "video") project.videos.splice(index, 1);
       try {
         await request("/api/save", state.data);
-        await request("/api/remove-media", { path });
+        if (path.startsWith("assets/")) await request("/api/remove-media", { path });
         refreshPreviews(project);
         flash("Média retiré du projet.");
       } catch (error) { refreshPreviews(project); flash(error.message, true); }

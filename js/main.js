@@ -995,6 +995,11 @@
 
   function videoMarkup(item, index) {
     const title = pick(item.title) || (t("project.videos") + " " + padNumber(index + 1));
+    if (item.type === "youtube" && /^[A-Za-z0-9_-]{11}$/.test(item.videoId || "")) {
+      return '<iframe class="video-frame__el" src="https://www.youtube-nocookie.com/embed/' + esc(item.videoId) + '" title="' + esc(title) +
+        '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
+        ' referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
+    }
     if (!item.src) {
       return mediaMarkup({
         ratio: "16 / 9",
