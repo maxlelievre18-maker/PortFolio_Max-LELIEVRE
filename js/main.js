@@ -13,6 +13,7 @@
   const T = window.TRANSLATIONS || { fr: {}, en: {} };
   const RAW_SITE = window.SITE || {};
   const PROJECTS = Array.isArray(window.PROJECTS) ? window.PROJECTS.slice() : [];
+  const SOFTWARE_CATALOG = Array.isArray(window.SOFTWARE_CATALOG) ? window.SOFTWARE_CATALOG : [];
 
   const DEFAULT_LANG = "fr";
   const STORAGE_KEY = "max-lelievre-lang";
@@ -53,6 +54,7 @@
     { key: "projects", name: "projects", href: "#/projects" },
     { key: "showreel", name: "showreel", href: "#/showreel" },
     { key: "about", name: "about", href: "#/about" },
+    { key: "cv", name: "cv", href: "#/cv" },
     { key: "contact", name: "contact", href: "#/contact" }
   ];
 
@@ -91,7 +93,7 @@
   function pick(value) {
     if (value === null || value === undefined) return "";
     if (typeof value === "string") return value;
-    return value[state.lang] || value.fr || value.en || "";
+    return value[state.lang] || "";
   }
 
   const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
@@ -128,6 +130,21 @@
     }).filter(Boolean);
   }
 
+  function projectTitle(project) {
+    return state.lang === "en" && project.titleEN ? project.titleEN : project.title;
+  }
+
+  function softwareMarks(items, modifier) {
+    return (items || []).map(function (item) {
+      const name = typeof item === "string" ? item : (item.name || "");
+      if (!name) return "";
+      const catalogItem = SOFTWARE_CATALOG.find(function (entry) { return entry.name === name; });
+      const icon = catalogItem ? '<img class="software-mark__icon" src="' + esc(catalogItem.logo) + '" alt="" loading="lazy">' : "";
+      const level = typeof item === "object" && item.level ? '<small>' + esc(item.level) + '</small>' : "";
+      return '<span class="software-mark' + (modifier ? " software-mark--" + modifier : "") + '">' + icon + '<span>' + esc(name) + '</span>' + level + '</span>';
+    }).join("");
+  }
+
   function projectCountLabel(count) {
     return t(count === 1 ? "projectsPage.countOne" : "projectsPage.countMany", { n: count });
   }
@@ -135,6 +152,10 @@
   function visibleProjects() {
     return PROJECTS.filter(function (project) {
       return project && project.id && project.visible !== false;
+    }).sort(function (a, b) {
+      const orderA = Number.isFinite(Number(a.order)) ? Number(a.order) : PROJECTS.indexOf(a) + 1;
+      const orderB = Number.isFinite(Number(b.order)) ? Number(b.order) : PROJECTS.indexOf(b) + 1;
+      return orderA - orderB;
     });
   }
 
@@ -174,7 +195,7 @@
     if (parts[0] === "project" && parts[1]) {
       return { name: "project", id: decodeURIComponent(parts[1]) };
     }
-    if (["projects", "showreel", "about", "contact"].indexOf(parts[0]) !== -1) {
+    if (["projects", "showreel", "about", "contact", "cv"].indexOf(parts[0]) !== -1) {
       return { name: parts[0] };
     }
     return { name: "notfound" };
@@ -304,7 +325,6 @@
               '<ul class="footer__list">' +
                 '<li>' + contactAction("footer__link") + '</li>' +
                 '<li>' + socialLink(t("contact.linkedinLabel"), SITE.linkedin) + '</li>' +
-                '<li>' + socialLink(t("contact.vimeoLabel"), SITE.vimeo) + '</li>' +
                 '<li>' + socialLink(t("contact.youtubeLabel"), SITE.youtube) + '</li>' +
               '</ul>' +
             '</div>' +
@@ -318,8 +338,6 @@
           '</div>' +
           '<div class="footer__bottom">' +
             '<p>' + esc(t("footer.copyright", { year: new Date().getFullYear() })) + '</p>' +
-            '<p>' + esc(SITE.location) + '</p>' +
-            '<p class="footer__note">' + esc(t("footer.tagline")) + '</p>' +
           '</div>' +
         '</div>';
     }
@@ -415,7 +433,9 @@
      ---------------------------------------------------------- */
   function renderRoute(options) {
     options = options || {};
+    const previousRoute = state.route;
     state.route = parseRoute();
+    const routeChanged = !state.firstRender && routeKey(previousRoute) !== routeKey(state.route);
     renderShell();
     const main = $("#main");
     if (!main) return;
@@ -445,12 +465,22 @@
         html = renderContactPage();
         setMeta(t("meta.contactTitle"), t("meta.contactDescription"));
         break;
+      case "cv":
+        html = renderCVPage();
+        setMeta("CV — Max Lelièvre", SITE.headline[state.lang]);
+        break;
       default:
         html = renderNotFoundPage();
         setMeta(t("meta.notFoundTitle"), t("meta.notFoundTitle"));
     }
 
     main.innerHTML = html;
+    if (routeChanged) {
+      main.classList.remove("route-enter");
+      void main.offsetWidth;
+      main.classList.add("route-enter");
+      window.setTimeout(function () { main.classList.remove("route-enter"); }, 420);
+    }
     updateHeader();
     setupReveals();
     setupComparisons();
@@ -475,6 +505,7 @@
     window.addEventListener("scroll", updateHeader, { passive: true });
 
     document.addEventListener("click", function (event) {
+      if (event.target.closest("[data-print-cv]")) { window.print(); return; }
       const langButton = event.target.closest("[data-lang]");
       if (langButton) {
         event.preventDefault();
@@ -542,6 +573,17 @@
 
       const hashLink = event.target.closest('a[href^="#/"]');
       if (hashLink && state.menuOpen) setMenu(false);
+    });
+
+    document.addEventListener("submit", function (event) {
+      const form = event.target.closest("[data-contact-form]");
+      if (!form) return;
+      event.preventDefault();
+      if (!SITE.email) { window.alert(t("contact.configureEmail")); return; }
+      const data = new FormData(form);
+      const subject = encodeURIComponent("Portfolio — " + data.get("name"));
+      const body = encodeURIComponent(data.get("message") + "\n\n" + (state.lang === "fr" ? "Réponse à" : "Reply to") + ": " + data.get("email"));
+      window.location.href = "mailto:" + encodeURIComponent(SITE.email) + "?subject=" + subject + "&body=" + body;
     });
 
     document.addEventListener("keydown", function (event) {
@@ -625,15 +667,15 @@
     const metaBits = [categories, project.year ? String(project.year) : "", status].filter(Boolean);
 
     return '<article class="project-card project-card--' + (isCompact ? "compact" : "featured") + '" data-reveal>' +
-      '<a class="project-card__link" href="#/project/' + encodeURIComponent(project.id) + '" aria-label="' + esc(t("common.projectLink", { title: project.title })) + '">' +
+      '<a class="project-card__link" href="#/project/' + encodeURIComponent(project.id) + '" aria-label="' + esc(t("common.projectLink", { title: projectTitle(project) })) + '">' +
         '<div class="project-card__media">' +
           mediaMarkup({
             src: project.thumbnail,
-            alt: pick(project.thumbnailAlt) || project.title,
+            alt: pick(project.thumbnailAlt) || projectTitle(project),
             ratio: isCompact ? "3 / 2" : "16 / 10",
             code: project.code,
             label: t("common.visualPending"),
-            meta: project.title,
+            meta: projectTitle(project),
             variant: (index % 3) + 1,
             className: "project-card__visual"
           }) +
@@ -644,7 +686,7 @@
           '<div class="project-card__meta">' +
             metaBits.map(function (item) { return '<span>' + esc(item) + '</span>'; }).join('<span class="project-card__sep" aria-hidden="true">/</span>') +
           '</div>' +
-          '<h3 class="project-card__title">' + esc(project.title) + '</h3>' +
+          '<h3 class="project-card__title">' + esc(projectTitle(project)) + '</h3>' +
           (role ? '<p class="project-card__role">' + esc(role) + '</p>' : "") +
           (description && !isCompact ? '<p class="project-card__desc">' + esc(description) + '</p>' : "") +
           '<span class="project-card__arrow" aria-hidden="true">→</span>' +
@@ -911,7 +953,7 @@
     const items = (project.gallery || []).filter(function (item) { return item && item.src; });
     if (!items.length) return "";
     return '<div class="gallery">' + items.map(function (item, index) {
-      const alt = pick(item.alt) || project.title;
+      const alt = pick(item.alt) || projectTitle(project);
       const caption = pick(item.caption);
       return '<figure class="gallery__item">' +
         '<button class="gallery__button" type="button" data-lightbox-index="' + index +
@@ -962,7 +1004,7 @@
     const items = (project.breakdown || []).filter(Boolean);
     if (!items.length) return "";
     return '<div class="breakdown-list">' + items.map(function (item, index) {
-      const title = pick(item.title) || ("Breakdown " + padNumber(index + 1));
+      const title = pick(item.title) || (state.lang === "fr" ? "Étape " : "Breakdown ") + padNumber(index + 1);
       let media = "";
       if (item.before && item.after) {
         media = compareMarkup(item.before, item.after, title);
@@ -993,7 +1035,7 @@
     });
     if (!items.length) return "";
     return '<div class="compare-list">' + items.map(function (item, index) {
-      const label = pick(item.label) || ("Comparaison " + padNumber(index + 1));
+      const label = pick(item.label) || (state.lang === "fr" ? "Comparaison " : "Comparison ") + padNumber(index + 1);
       return '<figure class="compare-block">' +
         compareMarkup(item.before, item.after, label) +
         '<figcaption class="compare-block__caption">' +
@@ -1029,11 +1071,11 @@
     return '<nav class="project-pager" aria-label="' + esc(t("project.sectionNav")) + '">' +
       '<a class="project-pager__item project-pager__item--prev" href="#/project/' + encodeURIComponent(previous.id) + '">' +
         '<span class="project-pager__label"><span aria-hidden="true">←</span> ' + esc(t("project.prev")) + '</span>' +
-        '<span class="project-pager__title">' + esc(previous.title) + '</span>' +
+        '<span class="project-pager__title">' + esc(projectTitle(previous)) + '</span>' +
       '</a>' +
       '<a class="project-pager__item project-pager__item--next" href="#/project/' + encodeURIComponent(next.id) + '">' +
         '<span class="project-pager__label">' + esc(t("project.next")) + ' <span aria-hidden="true">→</span></span>' +
-        '<span class="project-pager__title">' + esc(next.title) + '</span>' +
+        '<span class="project-pager__title">' + esc(projectTitle(next)) + '</span>' +
       '</a>' +
     '</nav>';
   }
@@ -1046,7 +1088,7 @@
     }
 
     setMeta(
-      t("meta.projectTitle", { title: project.title }),
+      t("meta.projectTitle", { title: projectTitle(project) }),
       pick(project.shortDescription) || t("meta.projectsDescription")
     );
 
@@ -1077,11 +1119,12 @@
         html: '<div class="prose">' + formatText(project.description) + '</div>'
       });
     }
-    if ((project.contributions || []).length) {
+    const contributions = (project.contributions || []).filter(function (item) { return Boolean(pick(item)); });
+    if (contributions.length) {
       sections.push({
         id: "contributions",
         label: t("project.contributions"),
-        html: '<ol class="contribution-list">' + project.contributions.filter(Boolean).map(function (item) {
+        html: '<ol class="contribution-list">' + contributions.map(function (item) {
           return '<li class="contribution-list__item">' + esc(pick(item)) + '</li>';
         }).join("") + '</ol>'
       });
@@ -1152,7 +1195,7 @@
             '<p class="eyebrow">' + esc(t("projectsPage.eyebrow")) + (project.code ? " — " + esc(project.code) : "") + '</p>' +
             (status ? '<span class="status-badge status-badge--' + esc(project.status || "draft") + '">' + esc(status) + '</span>' : "") +
           '</div>' +
-          '<h1 class="project-title" id="project-title">' + esc(project.title) + '</h1>' +
+          '<h1 class="project-title" id="project-title">' + esc(projectTitle(project)) + '</h1>' +
           (roleDescription ? '<p class="project-role">' + esc(roleDescription) + '</p>' : "") +
           (metaItems ? '<dl class="project-meta">' + metaItems + '</dl>' : "") +
         '</div>' +
@@ -1161,11 +1204,11 @@
         '<div class="project-hero-media" data-reveal>' +
           mediaMarkup({
             src: project.hero,
-            alt: pick(project.heroAlt) || project.title,
+            alt: pick(project.heroAlt) || projectTitle(project),
             ratio: "21 / 9",
             code: project.code,
             label: t("common.heroVisual"),
-            meta: project.title,
+            meta: projectTitle(project),
             variant: 1,
             orbit: true
           }) +
@@ -1293,18 +1336,18 @@
   function renderAboutPage() {
     const identity = t("about.identity");
     const sections = t("about.sections");
-    const software = t("about.software");
+    const software = SITE.software || [];
 
     return '<section class="page-hero" aria-labelledby="about-title">' +
         '<div class="container">' +
           '<p class="eyebrow">' + esc(t("about.eyebrow")) + '</p>' +
           '<h1 class="page-title" id="about-title">' + esc(t("about.title")) + '</h1>' +
-          '<p class="page-intro page-intro--large">' + esc(t("about.intro")) + '</p>' +
+          '<div class="page-intro page-intro--large">' + String(pick(SITE.bio)).split(/\n\n/).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join("") + '</div>' +
         '</div>' +
       '</section>' +
       '<div class="container about-layout">' +
         '<aside class="about-card" data-reveal>' +
-          '<div class="about-card__monogram" aria-hidden="true">ML</div>' +
+          (SITE.portrait ? '<img class="about-card__portrait" src="' + esc(SITE.portrait) + '" alt="' + esc(state.lang === "fr" ? "Portrait de Max Lelièvre" : "Portrait of Max Lelièvre") + '" onerror="this.hidden=true">' : '<div class="about-card__monogram" aria-hidden="true">ML</div>') +
           '<dl class="about-card__list">' +
             '<div class="about-card__row"><dt>' + esc(t("project.role")) + '</dt><dd>' + esc(identity.role) + '</dd></div>' +
             '<div class="about-card__row"><dt>Formation</dt><dd>' + esc(identity.status) + '</dd></div>' +
@@ -1330,11 +1373,9 @@
               '<span class="about-section__num">' + padNumber(sections.length + 1) + '</span>' +
               '<h2 class="about-section__title">' + esc(t("about.softwareTitle")) + '</h2>' +
             '</div>' +
-            '<ul class="tag-list">' + (software.length
-              ? software.map(function (item) {
-                  return '<li class="tag">' + esc(item) + '</li>';
-                }).join("")
-              : '<li class="tag tag--pending">' + esc(t("common.toBeCompleted")) + '</li>') + '</ul>' +
+            (software.length
+              ? '<div class="software-logo-list">' + softwareMarks(software, "about") + '</div>'
+              : '<p class="about-note">' + esc(t("common.toBeCompleted")) + '</p>') +
             '<p class="about-note">' + esc(t("about.softwareNote")) + '</p>' +
           '</section>' +
           '<section class="cv-panel" data-reveal aria-labelledby="cv-title">' +
@@ -1344,9 +1385,7 @@
               '<p class="cv-panel__text">' + esc(t("about.cvText")) + '</p>' +
             '</div>' +
             '<div class="cv-panel__action">' +
-              (SITE.cv
-                ? '<a class="btn btn--primary" href="' + esc(SITE.cv) + '" download>' + esc(t("about.cvButton")) + '<span aria-hidden="true">↓</span></a>'
-                : '<span class="btn btn--disabled" aria-disabled="true">' + esc(t("about.cvPending")) + '</span>') +
+              '<a class="btn btn--primary" href="#/cv">' + esc(t("about.cvButton")) + '<span aria-hidden="true">↓</span></a>' +
             '</div>' +
           '</section>' +
           '<section class="about-contact" data-reveal aria-labelledby="about-contact-title">' +
@@ -1359,6 +1398,51 @@
           '</section>' +
         '</div>' +
       '</div>';
+  }
+
+  /* ----------------------------------------------------------
+     CV — GÉNÉRÉ DEPUIS LES DONNÉES DU PORTFOLIO
+     ---------------------------------------------------------- */
+  function cvProjects() {
+    const valid = PROJECTS.filter(function (project) {
+      const contributions = (project.contributions || []).filter(function (item) { return Boolean(pick(item)); });
+      return project.visible !== false && project.status !== "draft" && hasText(project.title) &&
+        (hasText(project.role) || hasText(project.cvDescriptionFR) || hasText(project.cvDescriptionEN)) &&
+        (hasText(project.shortDescription) || hasText(project.description) || hasText(project.cvDescriptionFR) || hasText(project.cvDescriptionEN) || contributions.length > 0);
+    });
+    const chosen = valid.filter(function (project) { return project.includeInCV === true; })
+      .sort(function (a, b) { return Number(a.cvPriority ?? 999) - Number(b.cvPriority ?? 999); });
+    valid.filter(function (project) { return project.includeInCV !== true && project.includeInCV !== false; })
+      .sort(function (a, b) {
+        return String(b.year || "").localeCompare(String(a.year || "")) || PROJECTS.indexOf(b) - PROJECTS.indexOf(a);
+      })
+      .forEach(function (project) { if (chosen.length < 5) chosen.push(project); });
+    return chosen.slice(0, 5);
+  }
+
+  function renderCVPage() {
+    const lang = state.lang;
+    const labels = lang === "fr" ? { profile: "Profil", skills: "Compétences", software: "Logiciels", education: "Formation", projects: "Projets", contact: "Contact", print: "Exporter PDF / Imprimer le CV", back: "Retour au portfolio", year: "Année à préciser" } : { profile: "Profile", skills: "Skills", software: "Software", education: "Education", projects: "Projects", contact: "Contact", print: "Export PDF / Print CV", back: "Back to portfolio", year: "Year to be confirmed" };
+    const portrait = SITE.portrait ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait) + '" alt="" onerror="this.hidden=true">' : '';
+    const contact = [SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + '</a>' : '', SITE.phone ? '<a href="tel:' + esc(SITE.phone) + '">' + esc(SITE.phone) + '</a>' : '', SITE.linkedin ? '<a href="' + esc(SITE.linkedin) + '">LinkedIn</a>' : '', SITE.portfolioUrl ? '<a href="' + esc(SITE.portfolioUrl) + '">' + esc(SITE.portfolioUrl.replace(/^https?:\/\//, "")) + '</a>' : ''].filter(Boolean).join('<span>·</span>');
+    const projects = cvProjects();
+    return '<div class="cv-toolbar"><a class="btn btn--ghost" href="#/">← ' + esc(labels.back) + '</a>' + langSwitcher("lang-switch--cv") + '<button class="btn btn--primary" type="button" data-print-cv>' + esc(labels.print) + '</button></div>' +
+      '<article class="cv-sheet" aria-label="CV ' + esc(SITE.name) + '">' +
+        '<header class="cv-header">' + portrait + '<div><p class="cv-kicker">' + esc(labels.profile) + '</p><h1>' + esc(SITE.name.toLocaleUpperCase("fr")) + '</h1><p class="cv-headline">' + esc(pick(SITE.headline)) + '</p><p class="cv-contact">' + (contact || esc(SITE.location)) + '</p></div></header>' +
+        '<section class="cv-section"><h2>' + esc(labels.profile) + '</h2><p>' + esc(pick(SITE.cvIntro)) + '</p></section>' +
+        (SITE.skills && SITE.skills.length ? '<section class="cv-section"><h2>' + esc(labels.skills) + '</h2><p>' + SITE.skills.map(function (x) { return '<span class="cv-tag">' + esc(pick(x)) + '</span>'; }).join("") + '</p></section>' : '') +
+        (SITE.software && SITE.software.length ? '<section class="cv-section"><h2>' + esc(labels.software) + '</h2><div class="software-logo-list software-logo-list--cv">' + softwareMarks(SITE.software, "cv") + '</div></section>' : '') +
+        '<section class="cv-section"><h2>' + esc(labels.education) + '</h2>' + (SITE.education || []).map(function (ed) { return '<div class="cv-education"><strong>' + esc(ed.school) + '</strong><span>' + esc(pick(ed.degree)) + '</span><span>' + esc(pick(ed.graduation)) + '</span></div>'; }).join("") + '</section>' +
+        '<section class="cv-section"><h2>' + esc(labels.projects) + '</h2><div class="cv-projects">' + projects.map(function (p) {
+          const contribution = (p.contributions || []).map(pick).filter(Boolean).join(" · ");
+          const desc = lang === "fr" ? (p.cvDescriptionFR || contribution || pick(p.shortDescription) || pick(p.description)) : (p.cvDescriptionEN || contribution || pick(p.shortDescription) || pick(p.description));
+          if (!desc) return "";
+          const ongoing = p.status !== "completed" ? '<span class="cv-status">' + esc(pick(p.status === "preproduction" ? { fr: "En préproduction", en: "In preproduction" } : { fr: "En cours", en: "Ongoing" })) + '</span>' : '';
+          const image = p.thumbnail ? '<img src="' + esc(p.thumbnail) + '" alt="" loading="lazy">' : '<div class="cv-thumb cv-thumb--empty">' + esc(p.code || "VFX") + '</div>';
+          return '<article class="cv-project">' + image + '<div><h3>' + esc(projectTitle(p)) + '</h3><p class="cv-project__meta">' + esc(pick(p.role) || (lang === "fr" ? "VFX / Postproduction" : "VFX / Postproduction")) + ' · ' + esc(p.year || labels.year) + '</p><p>' + esc(desc) + '</p>' + ongoing + (p.software && p.software.length ? '<div class="software-logo-list software-logo-list--project">' + softwareMarks(p.software, "cv") + '</div>' : '') + '</div></article>';
+        }).join("") + '</div></section>' +
+        (contact ? '<section class="cv-section cv-section--contact"><h2>' + esc(labels.contact) + '</h2><p>' + contact + '</p></section>' : '') +
+      '</article>';
   }
 
   /* ----------------------------------------------------------
@@ -1385,7 +1469,6 @@
   function renderContactPage() {
     const socials = [
       { label: t("contact.linkedinLabel"), url: SITE.linkedin },
-      { label: t("contact.vimeoLabel"), url: SITE.vimeo },
       { label: t("contact.youtubeLabel"), url: SITE.youtube }
     ];
     const missing = !SITE.email || socials.some(function (item) { return !item.url; });
@@ -1409,6 +1492,13 @@
             : "") +
           (missing ? '<p class="contact-note">' + esc(t("contact.pendingNote")) + '</p>' : "") +
         '</div>' +
+        '<form class="contact-form" data-contact-form>' +
+          '<label>' + esc(t("contact.nameLabel")) + '<input name="name" required autocomplete="name"></label>' +
+          '<label>' + esc(t("contact.emailFromLabel")) + '<input name="email" type="email" required autocomplete="email"></label>' +
+          '<label>' + esc(t("contact.messageLabel")) + '<textarea name="message" rows="5" required></textarea></label>' +
+          '<button class="btn btn--primary" type="submit">' + esc(t("contact.send")) + '<span aria-hidden="true">→</span></button>' +
+          (!SITE.email ? '<p class="contact-note">' + esc(t("contact.configureEmail")) + '</p>' : '') +
+        '</form>' +
         '<aside class="contact-aside" data-reveal>' +
           '<div class="contact-card">' +
             '<p class="contact-card__label">' + esc(t("contact.availabilityLabel")) + '</p>' +

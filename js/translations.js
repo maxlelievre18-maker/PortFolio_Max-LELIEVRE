@@ -34,6 +34,7 @@ window.TRANSLATIONS = {
       showreel: "Showreel",
       about: "À propos",
       contact: "Contact",
+      cv: "CV",
       primary: "Navigation principale",
       mobile: "Menu principal",
       footer: "Navigation de pied de page"
@@ -90,7 +91,9 @@ window.TRANSLATIONS = {
         "short-film": "Court métrage",
         personal: "Projet personnel",
         experiment: "Expérimentation",
-        professional: "Projet professionnel"
+        professional: "Projet professionnel",
+        exercise: "Exercice",
+        "vfx-test": "Test VFX"
       },
       category: {
         postproduction: "Postproduction",
@@ -112,8 +115,8 @@ window.TRANSLATIONS = {
 
     home: {
       eyebrow: "Portfolio — 2026",
-      location: "Nantes, France",
-      availability: "Recherche de stage — postproduction / VFX",
+      location: "Nantes et Paris, France",
+      availability: "Travail VFX — compositing · cleaning · tracking · rotoscoping · intégration 3D",
       titleLine1: "Max",
       titleLine2: "Lelièvre",
       role: "VFX Artist",
@@ -227,7 +230,7 @@ window.TRANSLATIONS = {
         role: "VFX Artist",
         status: "Étudiant en audiovisuel",
         school: "CinéCréatis Nantes",
-        location: "Nantes, France"
+        location: "Nantes et Paris, France"
       },
       sections: [
         {
@@ -256,7 +259,7 @@ window.TRANSLATIONS = {
       software: [],
       softwareNote: "La liste des logiciels sera complétée prochainement.",
       cvTitle: "CV",
-      cvText: "La version PDF du CV sera ajoutée prochainement. Elle pourra être téléchargée directement depuis cette page.",
+      cvText: "Consultez l’aperçu bilingue de mon CV et exportez-le au format PDF depuis votre navigateur.",
       cvButton: "Télécharger le CV",
       cvPending: "CV bientôt disponible",
       cvRequest: "Demander le CV",
@@ -270,13 +273,17 @@ window.TRANSLATIONS = {
       title: "Contact",
       intro: "Pour une opportunité de stage, une collaboration ou une question autour d'un projet, vous pouvez me contacter directement.",
       availabilityLabel: "Disponibilité",
-      availability: "Stage en postproduction ou VFX",
+      availability: "Travail VFX — compositing · cleaning · tracking · rotoscoping · intégration 3D",
       locationLabel: "Localisation",
-      location: "Nantes, France",
+      location: "Nantes et Paris, France",
       emailLabel: "E-mail professionnel",
       linkedinLabel: "LinkedIn",
-      vimeoLabel: "Vimeo",
       youtubeLabel: "YouTube",
+      nameLabel: "Nom",
+      emailFromLabel: "E-mail",
+      messageLabel: "Message",
+      send: "Envoyer le message",
+      configureEmail: "Renseignez l’adresse e-mail professionnelle dans js/projects.js pour activer l’envoi.",
       pending: "À compléter",
       pendingNote: "Les coordonnées et les liens seront activés dès qu'ils seront disponibles.",
       responseNote: "Réponse sous quelques jours ouvrés.",
@@ -290,8 +297,8 @@ window.TRANSLATIONS = {
       contactTitle: "Contact",
       socialTitle: "Réseaux",
       languageTitle: "Langue",
-      copyright: "© {year} Max Lelièvre. Tous droits réservés.",
-      location: "Nantes, France",
+      copyright: "© 2026 Max Lelièvre - Tous droits réservés.",
+      location: "Nantes et Paris, France",
       top: "Retour en haut"
     },
 
@@ -329,6 +336,7 @@ window.TRANSLATIONS = {
       showreel: "Showreel",
       about: "About",
       contact: "Contact",
+      cv: "CV",
       primary: "Primary navigation",
       mobile: "Main menu",
       footer: "Footer navigation"
@@ -385,7 +393,9 @@ window.TRANSLATIONS = {
         "short-film": "Short film",
         personal: "Personal project",
         experiment: "Experiment",
-        professional: "Professional project"
+        professional: "Professional project",
+        exercise: "Exercise",
+        "vfx-test": "VFX test"
       },
       category: {
         postproduction: "Postproduction",
@@ -407,8 +417,8 @@ window.TRANSLATIONS = {
 
     home: {
       eyebrow: "Portfolio — 2026",
-      location: "Nantes, France",
-      availability: "Seeking an internship — postproduction / VFX",
+      location: "Nantes and Paris, France",
+      availability: "VFX work — compositing · cleaning · tracking · rotoscoping · 3D integration",
       titleLine1: "Max",
       titleLine2: "Lelièvre",
       role: "VFX Artist",
@@ -522,7 +532,7 @@ window.TRANSLATIONS = {
         role: "VFX Artist",
         status: "Film & audiovisual student",
         school: "CinéCréatis Nantes",
-        location: "Nantes, France"
+        location: "Nantes and Paris, France"
       },
       sections: [
         {
@@ -551,7 +561,7 @@ window.TRANSLATIONS = {
       software: [],
       softwareNote: "The software list will be completed soon.",
       cvTitle: "CV",
-      cvText: "The PDF version of the CV will be added soon. It will be available to download directly from this page.",
+      cvText: "Preview my CV in either language and export it as a PDF from your browser.",
       cvButton: "Download CV",
       cvPending: "CV coming soon",
       cvRequest: "Request CV",
@@ -565,13 +575,17 @@ window.TRANSLATIONS = {
       title: "Contact",
       intro: "For an internship opportunity, a collaboration or a question about a project, you can contact me directly.",
       availabilityLabel: "Availability",
-      availability: "Internship in postproduction or VFX",
+      availability: "VFX work — compositing · cleaning · tracking · rotoscoping · 3D integration",
       locationLabel: "Location",
-      location: "Nantes, France",
+      location: "Nantes and Paris, France",
       emailLabel: "Professional email",
       linkedinLabel: "LinkedIn",
-      vimeoLabel: "Vimeo",
       youtubeLabel: "YouTube",
+      nameLabel: "Name",
+      emailFromLabel: "Email",
+      messageLabel: "Message",
+      send: "Send message",
+      configureEmail: "Add your professional email address in js/projects.js to enable sending.",
       pending: "To be completed",
       pendingNote: "Contact details and links will be activated as soon as they are available.",
       responseNote: "Reply within a few working days.",
@@ -585,8 +599,8 @@ window.TRANSLATIONS = {
       contactTitle: "Contact",
       socialTitle: "Social",
       languageTitle: "Language",
-      copyright: "© {year} Max Lelièvre. All rights reserved.",
-      location: "Nantes, France",
+      copyright: "© 2026 Max Lelièvre - All rights reserved.",
+      location: "Nantes and Paris, France",
       top: "Back to top"
     },
 

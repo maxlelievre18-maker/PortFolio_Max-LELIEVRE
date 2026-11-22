@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1E2A">
+  <title>Gestion locale — Portfolio Max Lelièvre</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="manager.js" defer></script>
+</head>
+<body>
+  <header class="admin-header">
+    <a class="admin-brand" href="/admin/"><span>ML</span><span><strong>MAX LELIÈVRE</strong><small>GESTION LOCALE DU PORTFOLIO</small></span></a>
+    <div class="admin-header__actions"><a class="button button--quiet" href="/" target="_blank" rel="noopener">Voir le site ↗</a><span class="local-indicator">● Données stockées sur cet ordinateur</span></div>
+  </header>
+  <main class="admin-layout">
+    <aside class="library" aria-label="Projets enregistrés">
+      <div class="library__head"><div><p class="eyebrow">BIBLIOTHÈQUE</p><h1>Projets</h1></div><button class="button button--blue" id="new-project" type="button">＋ Nouveau projet</button></div>
+      <div id="project-list" class="project-list" aria-live="polite"><p class="muted">Chargement…</p></div>
+      <div class="library__foot"><p>Les projets masqués restent modifiables ici.</p><p>Outil local — aucun envoi vers un service externe.</p></div>
+    </aside>
+
+    <section class="editor" aria-labelledby="editor-title">
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+      <form id="project-form">
+        <div class="editor__head"><div><p class="eyebrow">FICHE PROJET</p><h2 id="editor-title">Nouveau projet</h2><p class="muted">Les champs anglais sont facultatifs ; laisse-les vides si le projet n’a pas de titre traduit.</p></div><div class="editor__actions"><button class="button button--quiet" id="preview-project" type="button">Aperçu du site ↗</button><button class="button button--blue" type="submit">Enregistrer le projet</button></div></div>
+        <input type="hidden" name="id">
+        <div class="form-grid">
+          <label class="field field--wide"><span>Nom du projet / titre du film</span><input name="title" required maxlength="120" placeholder="Ex. MON PROJET — Titre du film"></label>
+          <label class="field field--wide"><span>Titre anglais <small>Facultatif</small></span><input name="titleEN" maxlength="120" placeholder="English title"></label>
+          <label class="field"><span>Année</span><input name="year" inputmode="numeric" maxlength="4" placeholder="2026"></label>
+          <label class="field"><span>Ordre d’affichage <small>Plus petit = en premier</small></span><input name="order" type="number" min="0" step="1" value="1"></label>
+          <label class="field"><span>Priorité CV <small>Plus petit = affiché en premier</small></span><input name="cvPriority" type="number" min="0" step="1" value="10"></label>
+          <label class="field"><span>Type de projet</span><select name="type"><option value="">Choisir…</option><option value="short-film">Court métrage</option><option value="student">Film / projet étudiant</option><option value="exercise">Exercice</option><option value="vfx-test">Test VFX</option><option value="collaboration">Collaboration</option><option value="personal">Projet personnel</option><option value="experiment">Expérimentation</option><option value="professional">Projet professionnel</option></select></label>
+          <label class="field"><span>Statut</span><select name="status"><option value="draft">Brouillon — masqué</option><option value="preproduction">Préproduction</option><option value="in-development">En cours</option><option value="completed">Terminé</option></select></label>
+          <fieldset class="field field--wide category-field"><legend>Catégories <small>Choisis une ou plusieurs catégories</small></legend><div class="choice-row">
+            <label><input type="checkbox" name="category" value="vfx"> VFX</label><label><input type="checkbox" name="category" value="compositing"> Compositing</label><label><input type="checkbox" name="category" value="postproduction"> Postproduction</label><label><input type="checkbox" name="category" value="motion-design"> Motion Design</label><label><input type="checkbox" name="category" value="editing"> Editing / Montage</label><label><input type="checkbox" name="category" value="cleaning"> Cleaning</label><label><input type="checkbox" name="category" value="tracking"> Tracking</label><label><input type="checkbox" name="category" value="rotoscoping"> Rotoscoping</label>
+          </div></fieldset>
+          <label class="field"><span>Mon rôle — français</span><input name="roleFR" placeholder="Intitulé exact du poste"></label>
+          <label class="field"><span>My role — English</span><input name="roleEN" placeholder="Exact job title"></label>
+          <label class="field"><span>Description courte — français</span><textarea name="descriptionFR" rows="3" placeholder="1 à 3 phrases pour présenter le projet."></textarea></label>
+          <label class="field"><span>Short description — English</span><textarea name="descriptionEN" rows="3" placeholder="One to three sentences about the project."></textarea></label>
+          <label class="field"><span>Contribution personnelle — français</span><textarea name="contributionFR" rows="3" placeholder="Ce que tu as réellement réalisé, sans extrapoler."></textarea></label>
+          <label class="field"><span>Personal contribution — English</span><textarea name="contributionEN" rows="3" placeholder="What you actually did."></textarea></label>
+          <label class="field"><span>Objectif technique — français</span><textarea name="objectiveFR" rows="2" placeholder="Le défi ou l’effet recherché."></textarea></label>
+          <label class="field"><span>Technical objective — English</span><textarea name="objectiveEN" rows="2" placeholder="The challenge or effect you aimed to achieve."></textarea></label>
+          <fieldset class="field field--wide software-field"><legend>Logiciels utilisés <small>Sélectionne les logos des logiciels employés sur le projet.</small></legend><div id="software-picker" class="software-picker"><span class="muted">Chargement des logos…</span></div><p class="field-hint">N’ajoute que les outils que tu as réellement utilisés. La sélection affiche leur logo sur la fiche et le CV.</p></fieldset>
+          <label class="field"><span>Crédits <small>Un par ligne : rôle | nom</small></span><textarea name="credits" rows="3" placeholder="Réalisation | Nom&#10;École | CinéCréatis"></textarea></label>
+        </div>
+
+        <fieldset class="project-options"><legend>Publication et CV</legend><label><input name="featured" type="checkbox"> Projet à la une <small>Sinon, il apparaît dans « Autres projets ».</small></label><label class="cv-selection">Présence sur le CV<select name="cvSelection"><option value="auto">Automatique — peut compléter le CV</option><option value="yes">Oui — inclure en priorité</option><option value="no">Non — exclure du CV</option></select></label><label><input name="visible" type="checkbox" checked> Visible sur le site</label></fieldset>
+
+        <section class="media-manager" aria-labelledby="media-title"><div class="section-heading"><div><p class="eyebrow">IMAGES ET VIDÉOS</p><h2 id="media-title">Préparer les médias du projet</h2><p class="muted">Les fichiers sélectionnés sont copiés dans le dossier du projet sous <code>assets/</code>. Enregistre d’abord la fiche avant d’ajouter des médias.</p></div></div>
+          <div class="media-grid">
+            <article class="media-card media-card--cover"><div class="media-card__top"><span class="media-index">01</span><div><h3>Image principale · cover</h3><p>L’image de couverture du projet. Elle apparaît sur la carte et en tête de la page projet.</p></div><b>ESSENTIELLE</b></div><div class="file-row"><input type="file" data-upload="cover" accept="image/webp,image/jpeg,image/png,image/avif"><span data-media-result="cover">cover.webp · 1920 × 1080 recommandé</span></div><div class="media-preview" data-preview="cover"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">02</span><div><h3>Images du projet · stills</h3><p>Images représentatives du film ou du projet fini. Elles montrent le résultat dans son contexte.</p></div><b>RECOMMANDÉ</b></div><div class="file-row"><input type="file" data-upload="still" accept="image/webp,image/jpeg,image/png,image/avif" multiple><span data-media-result="still">still-01.webp · 1920 × 1080</span></div><div class="media-preview" data-preview="still"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">03</span><div><h3>Before / After</h3><p>Deux images du même plan : l’original avant intervention et le résultat après VFX. Choisis une paire pour le comparatif interactif.</p></div><b>VFX RECOMMANDÉ</b></div><div class="pair-inputs"><label>Avant<input type="file" data-upload="before" accept="image/webp,image/jpeg,image/png,image/avif"></label><label>Après<input type="file" data-upload="after" accept="image/webp,image/jpeg,image/png,image/avif"></label></div><span data-media-result="comparison">before-after-01-before / -after.webp · 1920 × 1080 recommandé</span><div class="media-preview" data-preview="comparison"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">04</span><div><h3>Breakdown vidéo</h3><p>Une courte démonstration du plan : étapes, passes ou évolution avant / après. 1080p, 15–45 secondes.</p></div><b>VFX RECOMMANDÉ</b></div><div class="file-row"><input type="file" data-upload="breakdown" accept="video/mp4,video/webm,video/quicktime" multiple><span data-media-result="breakdown">breakdown-01.mp4</span></div><div class="media-preview" data-preview="breakdown"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">05</span><div><h3>Capture technique · workflow</h3><p>Capture de Nuke, Blender ou d’un autre logiciel, lisible et en haute résolution. Masque les informations personnelles.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="technical" accept="image/webp,image/jpeg,image/png,image/avif" multiple><span data-media-result="technical">capture-01.webp · haute résolution</span></div><div class="media-preview" data-preview="technical"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">06</span><div><h3>Making-of · BTS</h3><p>Photo de tournage, du plateau ou des coulisses. Choisis une image qui apporte du contexte au projet.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="bts" accept="image/webp,image/jpeg,image/png,image/avif" multiple><span data-media-result="bts">bts-01.webp · photo haute résolution</span></div><div class="media-preview" data-preview="bts"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">07</span><div><h3>Vidéo du film / extrait</h3><p>Extrait représentatif du projet, uniquement si tu as le droit de le publier. Format MP4 1080p conseillé.</p></div><b>SI AUTORISÉ</b></div><div class="file-row"><input type="file" data-upload="film" accept="video/mp4,video/webm,video/quicktime"><span data-media-result="film">project.mp4</span></div><div class="media-preview" data-preview="film"></div></article>
+          </div>
+        </section>
+
+        <div class="save-bar"><span>Après l’enregistrement, commit et publie les fichiers sur GitHub Pages.</span><button class="button button--blue" type="submit">Enregistrer le projet</button></div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
