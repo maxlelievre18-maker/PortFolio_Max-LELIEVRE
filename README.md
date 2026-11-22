@@ -18,7 +18,7 @@ Le site de prévisualisation locale est servi sur [http://127.0.0.1:8765/](http:
 
 ## Créer ou modifier un projet
 
-Dans la colonne « Projets », sélectionne une fiche pour la modifier ou clique sur « Nouveau projet ». Renseigne les champs utiles ; aucun crédit, rôle, outil ou visuel n’est créé automatiquement.
+Dans l’onglet « Projets et médias », sélectionne une fiche pour la modifier ou clique sur « Nouveau projet ». L’onglet « Page À propos et affichage du site » sert à modifier séparément les textes, l’expérience Super U et le fond graphique. Les textes du site et de l’expérience sont présentés en colonnes française et anglaise. Renseigne les champs utiles ; aucun crédit, rôle, outil ou visuel n’est créé automatiquement.
 
 - **Nom du projet / titre du film** : titre original affiché en français.
 - **Titre anglais** : facultatif ; utilisé dans la version anglaise du site quand il est fourni.
@@ -38,7 +38,7 @@ Clique sur « Enregistrer le projet » avant d’ajouter des médias. Le gestion
 
 ## Ajouter images et vidéos
 
-Choisis un ou plusieurs fichiers dans la section dédiée de la fiche. Le gestionnaire les copie dans `assets/images/projects/<id>/` ou `assets/videos/projects/<id>/`, ajoute les chemins aux données du projet et montre un aperçu. Les formats et dimensions affichés sont des recommandations ; l’outil accepte WebP, JPEG, PNG et AVIF pour les images, MP4, WebM ou MOV pour les vidéos. Le MP4 H.264 est le format vidéo le plus largement lisible. Une vidéo lourde rallonge le chargement GitHub Pages : privilégie des extraits courts et compressés.
+Choisis un ou plusieurs fichiers dans la section dédiée de la fiche. Le gestionnaire les copie dans `assets/images/projects/<id>/` ou `assets/videos/projects/<id>/`, ajoute les chemins aux données du projet et montre un aperçu. Après l’ajout, le bouton « Légender » de chaque média ouvre des champs français et anglais facultatifs. Le type « Collaboration » révèle des champs pour le nom de la personne ou de la structure et un lien facultatif ; la catégorie « Intégration d’éléments 3D » est disponible dans les catégories de projet. Les formats et dimensions affichés sont des recommandations ; l’outil accepte WebP, JPEG, PNG et AVIF pour les images, MP4, WebM ou MOV pour les vidéos. Le MP4 H.264 est le format vidéo le plus largement lisible. Une vidéo lourde rallonge le chargement GitHub Pages : privilégie des extraits courts et compressés.
 
 | Fichier indicatif | Préparation conseillée | À quoi sert l’image / la vidéo ? | Priorité |
 | --- | --- | --- | --- |
@@ -56,13 +56,13 @@ Choisis un ou plusieurs fichiers dans la section dédiée de la fiche. Le gestio
 
 L’interface numérote les fichiers ajoutés et conserve leur extension réelle. Pour un Before / After, sélectionne le côté « Avant » puis le côté « Après » ; le comparatif ne s’affiche sur le site que lorsque les deux fichiers sont présents. Les choix de logiciels viennent des logos dans `assets/logos/` et du tableau `SOFTWARE_CATALOG` de `data/portfolio.json` ; ajoute une entrée à ce tableau si tu ajoutes un logo.
 
-## Profil et CV
+## Profil, page À propos et CV
 
-Les informations communes du profil sont dans `data/portfolio.json`, sous `SITE` : nom, e-mail, téléphone facultatif, LinkedIn, biographie FR / EN, introduction courte du CV, formation, compétences, logiciels et portrait. Pour les modifier, arrête d’abord le gestionnaire, édite `SITE` dans ce fichier JSON, puis redémarre `node project_manager.mjs`. Au démarrage, l’outil régénère `js/projects.js` depuis les données, sans avoir besoin d’enregistrer un projet. L’adresse professionnelle, le téléphone, LinkedIn, l’URL publique du portfolio et le portrait restent à compléter dans `SITE`.
+Dans le gestionnaire local, l’onglet « Page d’accueil » permet de remplacer le visuel principal et de modifier la description ainsi que la phrase de conclusion en français et en anglais. L’onglet « Page À propos et affichage du site » permet de modifier la présentation, les trois sections éditoriales, l’expérience professionnelle et l’option d’arrière-plan graphique. Les coordonnées e-mail, LinkedIn et YouTube se règlent dans le bloc SITE de data/portfolio.json. Les changements sont enregistrés dans le JSON et régénèrent js/projects.js.
 
-Pour le portrait, ajoute le fichier `assets/images/general/portrait.jpg` et renseigne `SITE.portrait` avec son chemin. Les compétences et logiciels vides ne sont pas inventés ni affichés.
+L’expérience Super U apparaît dans le CV avec la durée fournie (« Depuis 3 ans »). Tu peux modifier le poste et les textes depuis le gestionnaire sans ajouter d’intitulé de poste non confirmé.
 
-Le CV PDF est accessible par « CV » dans la navigation et par le bouton de la page À propos. La page du lecteur affiche un aperçu du PDF dans le navigateur et un bouton de téléchargement. Le gestionnaire génère un PDF français et un PDF anglais au démarrage, puis les met à jour à chaque sauvegarde de fiche. Les fichiers sont enregistrés dans `output/pdf/` ; attends les messages « CV PDF FR généré » et « CV PDF EN généré » dans la fenêtre du serveur avant de publier. Le PDF reprend les titres, dates, rôles, contributions, images, statuts et logos de logiciels présents dans les fiches. Pour un export manuel, l’aperçu de secours `index.html#/cv` s’imprime en A4 via « Enregistrer au format PDF ».
+Le CV s’ouvre dans l’aperçu intégré du site via le menu « CV ». Le bouton de téléchargement dans cet aperçu télécharge directement le PDF de la langue affichée. Le gestionnaire génère les deux versions au démarrage et les actualise après chaque enregistrement de projet ou du profil. Les PDF sont dans output/pdf/ ; attends les messages « CV PDF FR généré » et « CV PDF EN généré » avant de publier.
 
 ## Publier sur GitHub Pages
 

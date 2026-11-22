@@ -54,7 +54,7 @@
     { key: "projects", name: "projects", href: "#/projects" },
     { key: "showreel", name: "showreel", href: "#/showreel" },
     { key: "about", name: "about", href: "#/about" },
-    { key: "cv", name: "cv", href: "cv-viewer.html" },
+    { key: "cv", name: "cv", href: "#/cv" },
     { key: "contact", name: "contact", href: "#/contact" }
   ];
 
@@ -115,7 +115,7 @@
     const text = pick(value).trim();
     if (!text) return "";
     return text.split(/\n{2,}/).map(function (paragraph) {
-      return "<p>" + esc(paragraph).replace(/\n/g, "<br>") + "</p>";
+      return "<p>" + esc(pick(paragraph) || paragraph).replace(/\n/g, "<br>") + "</p>";
     }).join("");
   }
 
@@ -208,7 +208,7 @@
   }
 
   function navHref(item) {
-    return item.name === "cv" ? "cv-viewer.html?lang=" + state.lang : item.href;
+    return item.href;
   }
 
   function setMeta(title, description) {
@@ -244,15 +244,11 @@
   }
 
   function contactAction(className) {
-    if (SITE.email) {
-      return '<a class="' + className + '" href="mailto:' + esc(SITE.email) + '">' + esc(t("nav.contact")) +
-        '<span aria-hidden="true">↗</span></a>';
-    }
-    return '<a class="' + className + '" href="#/contact">' + esc(t("nav.contact")) +
-      '<span aria-hidden="true">→</span></a>';
+    return '<a class="' + className + '" href="#/contact">' + esc(t("nav.contact")) + '<span aria-hidden="true">→</span></a>';
   }
 
   function renderShell() {
+    document.body.classList.toggle("has-background-art", SITE.backgroundEffects !== false);
     const header = $("#site-header");
     if (header) {
       header.innerHTML =
@@ -315,7 +311,6 @@
           '<div class="footer__top">' +
             '<div class="footer__brand">' +
               brandMarkup("brand--footer") +
-              '<p class="footer__tagline">' + esc(t("footer.tagline")) + '</p>' +
               '<p class="footer__location">' + esc(SITE.location) + '</p>' +
             '</div>' +
             '<nav class="footer__col" aria-label="' + esc(t("nav.footer")) + '">' +
@@ -329,7 +324,6 @@
             '<div class="footer__col">' +
               '<h2 class="footer__title">' + esc(t("footer.contactTitle")) + '</h2>' +
               '<ul class="footer__list">' +
-                '<li>' + contactAction("footer__link") + '</li>' +
                 '<li>' + socialLink(t("contact.linkedinLabel"), SITE.linkedin) + '</li>' +
                 '<li>' + socialLink(t("contact.youtubeLabel"), SITE.youtube) + '</li>' +
               '</ul>' +
@@ -358,12 +352,31 @@
   }
 
   function socialLink(label, url) {
-    if (url) {
-      return '<a class="footer__link" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' +
-        esc(label) + '<span aria-hidden="true"> ↗</span><span class="sr-only"> (' + esc(t("common.externalLink")) + ')</span></a>';
-    }
-    return '<span class="footer__link footer__link--pending">' + esc(label) +
-      '<span class="footer__pending">' + esc(t("common.pending")) + '</span></span>';
+    const kind = label.toLowerCase().includes("youtube") ? "youtube" : "linkedin";
+    const icon = '<img class="social-logo" src="assets/icons/social-' + kind + '.svg" alt="">';
+    if (url) return '<a class="footer__link" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + icon + esc(label) + '<span aria-hidden="true"> ↗</span><span class="sr-only"> (' + esc(t("common.externalLink")) + ')</span></a>';
+    return '<span class="footer__link footer__link--pending">' + esc(label) + '<span class="footer__pending">' + esc(t("common.pending")) + '</span></span>';
+  }
+
+  function contactIcon(kind) {
+    if (kind === "linkedin" || kind === "youtube") return '<img class="contact-icon contact-icon--' + kind + '" src="assets/icons/social-' + kind + '.svg" alt="">';
+    const paths = {
+      email: '<path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/>'
+    };
+    return '<svg class="contact-icon contact-icon--' + kind + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (paths[kind] || paths.email) + '</svg>';
+  }
+
+  function contactProfileCard(kind, label, text) {
+    return '<div class="contact-profile contact-profile--static">' + contactIcon(kind) + '<span><small>' + esc(label) + '</small><strong>' + esc(text) + '</strong></span></div>';
+  }
+
+  function contactProfileLink(kind, label, url, text) {
+    if (!url) return '';
+    const external = kind !== "email";
+    return '<a class="contact-profile" href="' + esc(url) + '"' + (external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' +
+      contactIcon(kind) + '<span><small>' + esc(label) + '</small><strong>' + esc(text) + '</strong></span>' +
+      (external ? '<span class="contact-profile__arrow" aria-hidden="true">↗</span>' : '') +
+    '</a>';
   }
 
   /* ----------------------------------------------------------
@@ -511,7 +524,6 @@
     window.addEventListener("scroll", updateHeader, { passive: true });
 
     document.addEventListener("click", function (event) {
-      if (event.target.closest("[data-print-cv]")) { window.print(); return; }
       const langButton = event.target.closest("[data-lang]");
       if (langButton) {
         event.preventDefault();
@@ -587,8 +599,8 @@
       event.preventDefault();
       if (!SITE.email) { window.alert(t("contact.configureEmail")); return; }
       const data = new FormData(form);
-      const subject = encodeURIComponent("Portfolio — " + data.get("name"));
-      const body = encodeURIComponent(data.get("message") + "\n\n" + (state.lang === "fr" ? "Réponse à" : "Reply to") + ": " + data.get("email"));
+      const subject = encodeURIComponent(data.get("subject"));
+      const body = encodeURIComponent((state.lang === "fr" ? "Nom / Studio : " : "Name / Studio: ") + data.get("name") + "\n" + (state.lang === "fr" ? "E-mail : " : "Email: ") + data.get("email") + "\n\n" + data.get("message"));
       window.location.href = "mailto:" + encodeURIComponent(SITE.email) + "?subject=" + subject + "&body=" + body;
     });
 
@@ -733,7 +745,7 @@
                 '<span class="hero__line hero__line--2">' + esc(t("home.titleLine2")) + '</span>' +
               '</h1>' +
               '<p class="hero__role"><span>' + esc(t("home.role")) + '</span><span class="hero__role-sep" aria-hidden="true"></span><span>' + esc(t("home.discipline")) + '</span></p>' +
-              '<p class="hero__intro">' + esc(t("home.intro")) + '</p>' +
+              '<p class="hero__intro">' + esc(pick(SITE.home?.intro) || t("home.intro")) + '</p>' +
               '<div class="hero__actions">' +
                 '<a class="btn btn--primary" href="#/projects">' + esc(t("home.ctaProjects")) + '<span aria-hidden="true">→</span></a>' +
                 '<a class="btn btn--ghost" href="#/contact">' + esc(t("home.ctaContact")) + '</a>' +
@@ -849,7 +861,7 @@
     return '<section class="statement" aria-labelledby="statement-title">' +
       '<div class="container statement__inner" data-reveal>' +
         '<p class="eyebrow">' + esc(t("home.statementEyebrow")) + '</p>' +
-        '<h2 class="statement__text" id="statement-title">' + esc(t("home.statement")) + '</h2>' +
+        '<h2 class="statement__text" id="statement-title">' + esc(pick(SITE.home?.statement) || t("home.statement")) + '</h2>' +
         '<a class="text-link" href="#/about">' + esc(t("home.statementCta")) + ' <span aria-hidden="true">→</span></a>' +
       '</div>' +
     '</section>';
@@ -956,7 +968,7 @@
   }
 
   function renderGallery(project) {
-    const items = (project.gallery || []).filter(function (item) { return item && item.src; });
+    const items = orderedGalleryItems(project);
     if (!items.length) return "";
     return '<div class="gallery">' + items.map(function (item, index) {
       const alt = pick(item.alt) || projectTitle(project);
@@ -972,6 +984,14 @@
     }).join("") + '</div>';
   }
 
+  function orderedGalleryItems(project) {
+    return (project.gallery || []).filter(function (item) { return item && item.src; }).map(function (item, index) {
+      const path = String(item.src || "").toLowerCase();
+      const rank = /bts-/.test(path) ? 2 : /workflow-/.test(path) ? 1 : 0;
+      return { item: item, index: index, rank: rank };
+    }).sort(function (a, b) { return a.rank - b.rank || a.index - b.index; }).map(function (entry) { return entry.item; });
+  }
+
   function videoMarkup(item, index) {
     const title = pick(item.title) || (t("project.videos") + " " + padNumber(index + 1));
     if (!item.src) {
@@ -985,7 +1005,7 @@
     if (item.type === "file") {
       return '<video class="video-frame__el" controls preload="metadata"' +
         (item.poster ? ' poster="' + esc(item.poster) + '"' : "") + '>' +
-        '<source src="' + esc(item.src) + '">' +
+      '<source src="' + esc(item.src) + '"' + (/\.mov(?:$|[?#])/i.test(item.src) ? ' type="video/quicktime"' : /\.webm(?:$|[?#])/i.test(item.src) ? ' type="video/webm"' : ' type="video/mp4"') + '>' +
         esc(t("project.videoFallback")) +
       '</video>';
     }
@@ -1001,7 +1021,7 @@
       const title = pick(item.title);
       return '<figure class="video-block">' +
         '<div class="video-frame">' + videoMarkup(item, index) + '</div>' +
-        (title ? '<figcaption class="video-block__caption">' + esc(title) + '</figcaption>' : "") +
+        (title || pick(item.caption) ? '<figcaption class="video-block__caption">' + (title ? '<span>' + esc(title) + '</span>' : '') + (pick(item.caption) ? '<span class="video-block__comment">' + esc(pick(item.caption)) + '</span>' : '') + '</figcaption>' : "") +
       '</figure>';
     }).join("") + '</div>';
   }
@@ -1040,13 +1060,14 @@
       return item && item.before && item.after;
     });
     if (!items.length) return "";
-    return '<div class="compare-list">' + items.map(function (item, index) {
-      const label = pick(item.label) || (state.lang === "fr" ? "Comparaison " : "Comparison ") + padNumber(index + 1);
+    return '<div class="compare-list">' + items.map(function (item) {
+      const label = pick(item.label) || (state.lang === "fr" ? "Avant / après" : "Before / after");
       return '<figure class="compare-block">' +
         compareMarkup(item.before, item.after, label) +
         '<figcaption class="compare-block__caption">' +
-          '<span class="compare-block__num">' + padNumber(index + 1) + '</span>' +
           '<span>' + esc(label) + '</span>' +
+          (pick(item.beforeCaption) ? '<span class="compare-block__side-caption"><small>' + esc(state.lang === "fr" ? "Avant" : "Before") + '</small>' + esc(pick(item.beforeCaption)) + '</span>' : "") +
+          (pick(item.afterCaption) ? '<span class="compare-block__side-caption"><small>' + esc(state.lang === "fr" ? "Après" : "After") + '</small>' + esc(pick(item.afterCaption)) + '</span>' : "") +
         '</figcaption>' +
       '</figure>';
     }).join("") + '</div>';
@@ -1054,7 +1075,14 @@
 
   function renderCredits(project) {
     const items = (project.credits || []).filter(Boolean);
-    if (!items.length) return "";
+    const collaborator = project.collaborator && project.collaborator.name ? project.collaborator : null;
+    if (!items.length && !collaborator) return "";
+    const collaboratorUrl = /^https?:\/\//i.test(collaborator?.url || "") ? esc(collaborator.url) : "";
+    const collaboratorRow = collaborator
+      ? '<li class="credits-list__item"><span class="credits-list__role">' + esc(t("project.collaborator")) + '</span>' + (collaboratorUrl
+        ? '<a class="credits-list__name" href="' + collaboratorUrl + '" target="_blank" rel="noopener noreferrer">' + esc(collaborator.name) + ' ↗</a>'
+        : '<span class="credits-list__name">' + esc(collaborator.name) + '</span>') + '</li>'
+      : "";
     return '<ul class="credits-list">' + items.map(function (item) {
       if (typeof item === "string") {
         return '<li class="credits-list__item"><span class="credits-list__name">' + esc(item) + '</span></li>';
@@ -1063,7 +1091,7 @@
         '<span class="credits-list__role">' + esc(pick(item.role)) + '</span>' +
         '<span class="credits-list__name">' + esc(item.name || "") + '</span>' +
       '</li>';
-    }).join("") + '</ul>';
+    }).join("") + collaboratorRow + '</ul>';
   }
 
   function renderProjectPager(project) {
@@ -1098,7 +1126,7 @@
       pick(project.shortDescription) || t("meta.projectsDescription")
     );
 
-    state.gallery = (project.gallery || []).filter(function (item) { return item && item.src; });
+    state.gallery = orderedGalleryItems(project);
 
     const status = taxonomyLabel("status", project.status);
     const type = taxonomyLabel("type", project.type);
@@ -1154,7 +1182,7 @@
     if ((project.comparisons || []).filter(function (item) { return item && item.before && item.after; }).length) {
       sections.push({ id: "comparisons", label: t("project.comparisons"), html: renderComparisons(project) });
     }
-    if ((project.credits || []).length) {
+    if ((project.credits || []).length || project.collaborator?.name) {
       sections.push({ id: "credits", label: t("project.credits"), html: renderCredits(project) });
     }
 
@@ -1218,6 +1246,7 @@
             variant: 1,
             orbit: true
           }) +
+          (pick(project.thumbnailCaption) ? '<p class="project-cover-caption">' + esc(pick(project.thumbnailCaption)) + '</p>' : '') +
         '</div>' +
         note +
       '</div>' +
@@ -1341,14 +1370,16 @@
      ---------------------------------------------------------- */
   function renderAboutPage() {
     const identity = t("about.identity");
-    const sections = t("about.sections");
+    const about = SITE.about || {};
+    const sections = about.sections || t("about.sections");
+    const aboutIntro = pick(about.intro) || pick(SITE.bio);
     const software = SITE.software || [];
 
     return '<section class="page-hero" aria-labelledby="about-title">' +
         '<div class="container">' +
           '<p class="eyebrow">' + esc(t("about.eyebrow")) + '</p>' +
           '<h1 class="page-title" id="about-title">' + esc(t("about.title")) + '</h1>' +
-          '<div class="page-intro page-intro--large">' + String(pick(SITE.bio)).split(/\n\n/).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join("") + '</div>' +
+          '<div class="page-intro page-intro--large">' + String(aboutIntro).split(/\n\n/).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join("") + '</div>' +
         '</div>' +
       '</section>' +
       '<div class="container about-layout">' +
@@ -1367,10 +1398,10 @@
             return '<section class="about-section" data-reveal>' +
               '<div class="about-section__head">' +
                 '<span class="about-section__num">' + padNumber(index + 1) + '</span>' +
-                '<h2 class="about-section__title">' + esc(section.title) + '</h2>' +
+                '<h2 class="about-section__title">' + esc(pick(section.title) || section.title) + '</h2>' +
               '</div>' +
-              '<div class="prose">' + (section.body || []).map(function (paragraph) {
-                return '<p>' + esc(paragraph) + '</p>';
+              '<div class="prose">' + (Array.isArray(section.body) ? section.body : (pick(section.body) || [])).map(function (paragraph) {
+                return '<p>' + esc(pick(paragraph) || paragraph) + '</p>';
               }).join("") + '</div>' +
             '</section>';
           }).join("") +
@@ -1391,7 +1422,7 @@
               '<p class="cv-panel__text">' + esc(t("about.cvText")) + '</p>' +
             '</div>' +
             '<div class="cv-panel__action">' +
-              '<a class="btn btn--primary" href="cv-viewer.html?lang=' + state.lang + '">' + esc(t("about.cvButton")) + '<span aria-hidden="true">↓</span></a>' +
+              '<a class="btn btn--primary" href="#/cv">' + esc(t("about.cvButton")) + '<span aria-hidden="true">→</span></a>' +
             '</div>' +
           '</section>' +
           '<section class="about-contact" data-reveal aria-labelledby="about-contact-title">' +
@@ -1428,95 +1459,67 @@
 
   function renderCVPage() {
     const lang = state.lang;
-    const labels = lang === "fr" ? { profile: "Profil", skills: "Compétences", software: "Logiciels", education: "Formation", projects: "Projets", contact: "Contact", print: "Exporter PDF / Imprimer le CV", back: "Retour au portfolio", year: "Année à préciser" } : { profile: "Profile", skills: "Skills", software: "Software", education: "Education", projects: "Projects", contact: "Contact", print: "Export PDF / Print CV", back: "Back to portfolio", year: "Year to be confirmed" };
-    const portrait = SITE.portrait ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait) + '" alt="" onerror="this.hidden=true">' : '';
-    const contact = [SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + '</a>' : '', SITE.phone ? '<a href="tel:' + esc(SITE.phone) + '">' + esc(SITE.phone) + '</a>' : '', SITE.linkedin ? '<a href="' + esc(SITE.linkedin) + '">LinkedIn</a>' : '', SITE.youtube ? '<a href="' + esc(SITE.youtube) + '">YouTube</a>' : '', SITE.portfolioUrl ? '<a href="' + esc(SITE.portfolioUrl) + '">' + esc(SITE.portfolioUrl.replace(/^https?:\/\//, "")) + '</a>' : ''].filter(Boolean).join('<span>·</span>');
+    const labels = lang === "fr"
+      ? { profile: "Profil", skills: "Compétences", software: "Logiciels", education: "Formation", experience: "Expérience professionnelle", projects: "Projets", download: "Télécharger le CV en PDF", back: "Retour au portfolio", year: "Année à préciser", developed: "Compétences développées" }
+      : { profile: "Profile", skills: "Skills", software: "Software", education: "Education", experience: "Professional experience", projects: "Projects", download: "Download CV as PDF", back: "Back to portfolio", year: "Year to be confirmed", developed: "Skills developed" };
     const projects = cvProjects();
-    return '<div class="cv-toolbar"><a class="btn btn--ghost" href="#/">← ' + esc(labels.back) + '</a>' + langSwitcher("lang-switch--cv") + '<button class="btn btn--primary" type="button" data-print-cv>' + esc(labels.print) + '</button></div>' +
-      '<article class="cv-sheet" aria-label="CV ' + esc(SITE.name) + '">' +
-        '<header class="cv-header">' + portrait + '<div><p class="cv-kicker">' + esc(labels.profile) + '</p><h1>' + esc(SITE.name.toLocaleUpperCase("fr")) + '</h1><p class="cv-headline">' + esc(pick(SITE.headline)) + '</p><p class="cv-contact">' + (contact || esc(SITE.location)) + '</p></div></header>' +
-        '<section class="cv-section"><h2>' + esc(labels.profile) + '</h2><p>' + esc(pick(SITE.cvIntro)) + '</p></section>' +
-        (SITE.skills && SITE.skills.length ? '<section class="cv-section"><h2>' + esc(labels.skills) + '</h2><p>' + SITE.skills.map(function (x) { return '<span class="cv-tag">' + esc(pick(x)) + '</span>'; }).join("") + '</p></section>' : '') +
-        (SITE.software && SITE.software.length ? '<section class="cv-section"><h2>' + esc(labels.software) + '</h2><div class="software-logo-list software-logo-list--cv">' + softwareMarks(SITE.software, "cv") + '</div></section>' : '') +
-        '<section class="cv-section"><h2>' + esc(labels.education) + '</h2>' + (SITE.education || []).map(function (ed) { return '<div class="cv-education"><strong>' + esc(ed.school) + '</strong><span>' + esc(pick(ed.degree)) + '</span><span>' + esc(pick(ed.graduation)) + '</span></div>'; }).join("") + '</section>' +
-        '<section class="cv-section"><h2>' + esc(labels.projects) + '</h2><div class="cv-projects">' + projects.map(function (p) {
-          const contribution = (p.contributions || []).map(pick).filter(Boolean).join(" · ");
-          const desc = lang === "fr" ? (p.cvDescriptionFR || contribution || pick(p.shortDescription) || pick(p.description)) : (p.cvDescriptionEN || contribution || pick(p.shortDescription) || pick(p.description));
-          if (!desc) return "";
-          const ongoing = p.status !== "completed" ? '<span class="cv-status">' + esc(pick(p.status === "preproduction" ? { fr: "En préproduction", en: "In preproduction" } : { fr: "En cours", en: "Ongoing" })) + '</span>' : '';
-          const image = p.thumbnail ? '<img src="' + esc(p.thumbnail) + '" alt="" loading="lazy">' : '<div class="cv-thumb cv-thumb--empty">' + esc(p.code || "VFX") + '</div>';
-          return '<article class="cv-project">' + image + '<div><h3>' + esc(projectTitle(p)) + '</h3><p class="cv-project__meta">' + esc(pick(p.role) || (lang === "fr" ? "VFX / Postproduction" : "VFX / Postproduction")) + ' · ' + esc(p.year || labels.year) + '</p><p>' + esc(desc) + '</p>' + ongoing + (p.software && p.software.length ? '<div class="software-logo-list software-logo-list--project">' + softwareMarks(p.software, "cv") + '</div>' : '') + '</div></article>';
-        }).join("") + '</div></section>' +
-        (contact ? '<section class="cv-section cv-section--contact"><h2>' + esc(labels.contact) + '</h2><p>' + contact + '</p></section>' : '') +
-      '</article>';
+    const cvContacts = [
+      contactProfileLink("email", t("contact.emailLabel"), SITE.email ? "mailto:" + SITE.email : "", SITE.email),
+      contactProfileLink("linkedin", t("contact.linkedinLabel"), SITE.linkedin, SITE.name),
+      contactProfileLink("youtube", t("contact.youtubeLabel"), SITE.youtube, SITE.name)
+    ].filter(Boolean).join("");
+    const skillsSection = SITE.skills?.length
+      ? '<section class="cv-section"><h2>' + esc(labels.skills) + '</h2><p>' + SITE.skills.map(skill => '<span class="cv-tag">' + esc(pick(skill)) + '</span>').join("") + '</p></section>'
+      : "";
+    const softwareSection = SITE.software?.length
+      ? '<section class="cv-section"><h2>' + esc(labels.software) + '</h2><div class="software-logo-list software-logo-list--cv">' + softwareMarks(SITE.software, "cv") + '</div></section>'
+      : "";
+    const educationSection = '<section class="cv-section"><h2>' + esc(labels.education) + '</h2>' + (SITE.education || []).map(item => '<div class="cv-education"><strong>' + esc(item.school) + '</strong><span>' + esc(pick(item.degree)) + '</span><span>' + esc(pick(item.graduation)) + '</span></div>').join("") + '</section>';
+    const projectSection = '<section class="cv-section"><h2>' + esc(labels.projects) + '</h2><div class="cv-projects">' + projects.map(project => {
+      const contribution = (project.contributions || []).map(pick).filter(Boolean).join(" · ");
+      const description = lang === "fr"
+        ? (project.cvDescriptionFR || contribution || pick(project.shortDescription) || pick(project.description))
+        : (project.cvDescriptionEN || contribution || pick(project.shortDescription) || pick(project.description));
+      if (!description) return "";
+      const status = project.status !== "completed"
+        ? '<span class="cv-status">' + esc(pick(project.status === "preproduction" ? { fr: "En préproduction", en: "In preproduction" } : { fr: "En cours", en: "Ongoing" })) + '</span>'
+        : "";
+      const image = project.thumbnail
+        ? '<img src="' + esc(project.thumbnail) + '" alt="" loading="lazy">'
+        : '<div class="cv-thumb cv-thumb--empty">' + esc(project.code || "VFX") + '</div>';
+      return '<article class="cv-project">' + image + '<div><h3>' + esc(projectTitle(project)) + '</h3><p class="cv-project__meta">' + esc(pick(project.role) || "VFX / Postproduction") + ' · ' + esc(project.year || labels.year) + '</p><p>' + esc(description) + '</p>' + status + (project.software?.length ? '<div class="software-logo-list software-logo-list--project">' + softwareMarks(project.software, "cv") + '</div>' : "") + '</div></article>';
+    }).join("") + '</div></section>';
+    const experienceSection = (SITE.experience || []).filter(item => item && item.employer).map(item => {
+      const skills = (item.skillsDeveloped?.[lang] || []).filter(Boolean);
+      return '<article class="cv-experience"><div><h3>' + esc(item.employer) + '</h3><p>' + esc(pick(item.role)) + '</p></div><div><strong>' + esc(pick(item.period)) + '</strong><p>' + esc(pick(item.description)) + '</p>' + (skills.length ? '<p class="cv-experience__skills-title">' + esc(labels.developed) + '</p><ul class="cv-experience__skills">' + skills.map(skill => '<li>' + esc(skill) + '</li>').join("") + '</ul>' : "") + '</div></article>';
+    }).join("");
+    const pdfSrc = "output/pdf/cv-max-lelievre-" + lang + ".pdf#toolbar=0&navpanes=0";
+    const pdfPreview = '<details class="cv-pdf-preview"><summary>' + (lang === "fr" ? "Aperçu du PDF généré" : "Preview generated PDF") + '</summary><iframe src="' + pdfSrc + '" title="' + (lang === "fr" ? "Aperçu du CV en PDF" : "PDF CV preview") + '"></iframe></details>';
+    return '<div class="cv-toolbar"><a class="btn btn--ghost" href="#/">← ' + esc(labels.back) + '</a>' + langSwitcher("lang-switch--cv") + '<a class="btn btn--primary" href="output/pdf/cv-max-lelievre-' + lang + '.pdf" download="Max-Lelievre-CV-' + lang.toUpperCase() + '.pdf">' + esc(labels.download) + ' ↓</a></div>' +
+      '<article class="cv-sheet" aria-label="CV ' + esc(SITE.name) + '"><header class="cv-header' + (SITE.portrait ? ' cv-header--with-portrait' : '') + '">' + (SITE.portrait ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait) + '" alt="" onerror="this.hidden=true">' : '') + '<div class="cv-header__main"><p class="cv-kicker">CV · ' + esc(labels.profile) + '</p><h1>' + esc(SITE.name.toLocaleUpperCase("fr")) + '</h1><p class="cv-headline">' + esc(pick(SITE.headline)) + '</p><div class="cv-contact-box" aria-label="' + esc(t("contact.title")) + '">' + cvContacts + '</div></div></header>' +
+      '<section class="cv-section"><h2>' + esc(labels.profile) + '</h2><p>' + esc(pick(SITE.cvIntro)) + '</p></section>' + skillsSection + softwareSection + educationSection + projectSection +
+      (experienceSection ? '<section class="cv-section"><h2>' + esc(labels.experience) + '</h2><div class="cv-experiences">' + experienceSection + '</div></section>' : "") + '</article>' + pdfPreview;
   }
 
   /* ----------------------------------------------------------
      PAGE CONTACT
      ---------------------------------------------------------- */
-  function contactRow(label, value, url, options) {
-    options = options || {};
-    const isEmail = options.email === true;
-    if (url) {
-      return '<a class="contact-row" href="' + esc(url) + '"' +
-        (isEmail ? "" : ' target="_blank" rel="noopener noreferrer"') + '>' +
-        '<span class="contact-row__label">' + esc(label) + '</span>' +
-        '<span class="contact-row__value">' + esc(value) +
-          '<span class="contact-row__arrow" aria-hidden="true">' + (isEmail ? "→" : "↗") + '</span>' +
-        '</span>' +
-      '</a>';
-    }
-    return '<div class="contact-row contact-row--pending">' +
-      '<span class="contact-row__label">' + esc(label) + '</span>' +
-      '<span class="contact-row__value">' + esc(t("contact.pending")) + '</span>' +
-    '</div>';
-  }
-
   function renderContactPage() {
-    const socials = [
-      { label: t("contact.linkedinLabel"), url: SITE.linkedin },
-      { label: t("contact.youtubeLabel"), url: SITE.youtube }
-    ];
-    const missing = !SITE.email || socials.some(function (item) { return !item.url; });
-
-    return '<section class="page-hero" aria-labelledby="contact-title">' +
-        '<div class="container">' +
-          '<p class="eyebrow">' + esc(t("contact.eyebrow")) + '</p>' +
-          '<h1 class="page-title" id="contact-title">' + esc(t("contact.title")) + '</h1>' +
-          '<p class="page-intro page-intro--large">' + esc(t("contact.intro")) + '</p>' +
-        '</div>' +
+    const email = SITE.email || "";
+    return '<section class="page-hero" aria-labelledby="contact-title"><div class="container"><p class="eyebrow">' + esc(t("contact.eyebrow")) + '</p><h1 class="page-title" id="contact-title">' + esc(t("contact.title")) + '</h1><p class="page-intro page-intro--large">' + esc(t("contact.intro")) + '</p></div></section>' +
+      '<section class="container contact-profiles" aria-label="' + esc(t("contact.title")) + '" data-reveal>' +
+        contactProfileCard("email", t("contact.emailLabel"), email) +
+        (SITE.linkedin ? contactProfileLink("linkedin", t("contact.linkedinLabel"), SITE.linkedin, SITE.name) : "") +
+        (SITE.youtube ? contactProfileLink("youtube", t("contact.youtubeLabel"), SITE.youtube, SITE.name) : "") +
       '</section>' +
-      '<div class="container contact-layout">' +
-        '<div class="contact-main" data-reveal>' +
-          contactRow(t("contact.emailLabel"), SITE.email || t("contact.pending"), SITE.email ? "mailto:" + SITE.email : "", { email: true }) +
-          socials.map(function (item) {
-            return contactRow(item.label, item.url || t("contact.pending"), item.url || "");
-          }).join("") +
-          (SITE.email
-            ? '<button class="contact-copy" type="button" data-copy-email="' + esc(SITE.email) + '">' +
-                esc(t("contact.copyEmail")) + '<span aria-hidden="true">⧉</span></button>'
-            : "") +
-          (missing ? '<p class="contact-note">' + esc(t("contact.pendingNote")) + '</p>' : "") +
-        '</div>' +
+      '<section class="container contact-form-section" aria-labelledby="contact-form-title"><h2 class="section-title" id="contact-form-title">' + esc(t("contact.formTitle")) + '</h2><p class="section-intro">' + esc(t("contact.formIntro")) + '</p>' +
         '<form class="contact-form" data-contact-form>' +
-          '<label>' + esc(t("contact.nameLabel")) + '<input name="name" required autocomplete="name"></label>' +
-          '<label>' + esc(t("contact.emailFromLabel")) + '<input name="email" type="email" required autocomplete="email"></label>' +
-          '<label>' + esc(t("contact.messageLabel")) + '<textarea name="message" rows="5" required></textarea></label>' +
-          '<button class="btn btn--primary" type="submit">' + esc(t("contact.send")) + '<span aria-hidden="true">→</span></button>' +
-          (!SITE.email ? '<p class="contact-note">' + esc(t("contact.configureEmail")) + '</p>' : '') +
-        '</form>' +
-        '<aside class="contact-aside" data-reveal>' +
-          '<div class="contact-card">' +
-            '<p class="contact-card__label">' + esc(t("contact.availabilityLabel")) + '</p>' +
-            '<p class="contact-card__value">' + esc(t("contact.availability")) + '</p>' +
-            '<span class="contact-card__line" aria-hidden="true"></span>' +
-            '<p class="contact-card__label">' + esc(t("contact.locationLabel")) + '</p>' +
-            '<p class="contact-card__value">' + esc(SITE.location || t("contact.location")) + '</p>' +
-            '<span class="contact-card__line" aria-hidden="true"></span>' +
-            '<p class="contact-card__note">' + esc(t("contact.responseNote")) + '</p>' +
-          '</div>' +
-        '</aside>' +
-      '</div>';
+          '<label>' + esc(t("contact.nameLabel")) + '<input name="name" type="text" autocomplete="name" required></label>' +
+          '<label>' + esc(t("contact.subjectLabel")) + '<input name="subject" type="text" required></label>' +
+          '<label>' + esc(t("contact.emailFromLabel")) + '<input name="email" type="email" autocomplete="email" required></label>' +
+          '<label>' + esc(t("contact.messageLabel")) + '<textarea name="message" rows="6" required></textarea></label>' +
+          '<button class="btn btn--primary" type="submit">' + esc(t("contact.send")) + '</button>' +
+        '</form></section>';
   }
 
   function renderNotFoundPage() {

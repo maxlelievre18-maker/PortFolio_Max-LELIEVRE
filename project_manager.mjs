@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { createReadStream } from "node:fs";
 import { readFile, writeFile, mkdir, stat, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -90,6 +91,17 @@ async function upload(payload) {
   await writeFile(full, bytes);
   return { ok: true, path: path.relative(ROOT, full).replaceAll("\\", "/"), size: bytes.length };
 }
+async function uploadHomeImage(payload) {
+  const ext = path.extname(path.basename(String(payload.filename || ""))).toLowerCase();
+  if (![".webp", ".jpg", ".jpeg", ".png", ".avif"].includes(ext)) throw new Error("Choisis une image WebP, JPEG, PNG ou AVIF.");
+  const bytes = Buffer.from(String(payload.data || ""), "base64");
+  if (!bytes.length || bytes.length > MAX_FILE) throw new Error("Fichier vide ou supérieur à 120 Mo.");
+  const folder = path.join(ROOT, "assets", "images", "home");
+  await mkdir(folder, { recursive: true });
+  const full = path.join(folder, `hero${ext}`);
+  await writeFile(full, bytes);
+  return { ok: true, path: path.relative(ROOT, full).replaceAll("\\", "/"), size: bytes.length };
+}
 async function findEdge() {
   const candidates = [
     process.env["ProgramFiles(x86)"] && path.join(process.env["ProgramFiles(x86)"], "Microsoft", "Edge", "Application", "msedge.exe"),
@@ -161,6 +173,7 @@ async function serve(req, res) {
       if (origin && origin !== `http://${HOST}:${PORT}`) { json(res, 403, { error: "Origine refusée." }); return; }
       const payload = await body(req);
       if (url.pathname === "/api/save") { await writeData(payload); queuePdfGeneration(); json(res, 200, { ok: true }); return; }
+      if (url.pathname === "/api/upload-home-image") { json(res, 200, await uploadHomeImage(payload)); return; }
       if (url.pathname === "/api/upload") { json(res, 200, await upload(payload)); return; }
       json(res, 404, { error: "Route inconnue." }); return;
     }
@@ -172,8 +185,22 @@ async function serve(req, res) {
     if (target !== ROOT && !target.startsWith(ROOT + path.sep)) { res.writeHead(403).end("Forbidden"); return; }
     const info = await stat(target);
     if (!info.isFile()) { res.writeHead(404).end("Not found"); return; }
-    res.writeHead(200, { "Content-Type": MIME[path.extname(target).toLowerCase()] || "application/octet-stream", "Content-Length": info.size, "Cache-Control": "no-cache" });
-    if (req.method === "HEAD") res.end(); else res.end(await readFile(target));
+    const type = MIME[path.extname(target).toLowerCase()] || "application/octet-stream";
+    const range = req.headers.range;
+    if (type.startsWith("video/") && range) {
+      const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+      if (!match || (!match[1] && !match[2])) { res.writeHead(416, { "Content-Range": `bytes */${info.size}` }).end(); return; }
+      const start = match[1] ? Number(match[1]) : Math.max(0, info.size - Number(match[2]));
+      const end = match[2] && match[1] ? Math.min(Number(match[2]), info.size - 1) : info.size - 1;
+      if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start > end || start >= info.size) {
+        res.writeHead(416, { "Content-Range": `bytes */${info.size}` }).end(); return;
+      }
+      res.writeHead(206, { "Content-Type": type, "Content-Length": end - start + 1, "Content-Range": `bytes ${start}-${end}/${info.size}`, "Accept-Ranges": "bytes", "Cache-Control": "no-cache" });
+      if (req.method === "HEAD") res.end(); else createReadStream(target, { start, end }).pipe(res);
+      return;
+    }
+    res.writeHead(200, { "Content-Type": type, "Content-Length": info.size, "Accept-Ranges": type.startsWith("video/") ? "bytes" : "none", "Cache-Control": "no-cache" });
+    if (req.method === "HEAD") res.end(); else if (type.startsWith("video/")) createReadStream(target).pipe(res); else res.end(await readFile(target));
   } catch (error) {
     const code = error.code === "ENOENT" ? 404 : 400;
     if (!res.headersSent) json(res, code, { error: error.message || "Erreur du gestionnaire." });

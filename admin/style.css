@@ -336,6 +336,9 @@ body {
   font-size:10px;
   cursor:pointer
 }
+.choice-row label { flex:0 1 auto; min-width:0; max-width:100%; white-space:normal; line-height:1.35; }
+.choice-row label input { flex:0 0 auto; }
+.category-field .choice-row input { width:14px; min-height:14px; padding:0; border:0; accent-color:var(--blue); }
 .choice-row input,.project-options input {
   accent-color:#7ea5c1
 }
@@ -450,6 +453,7 @@ body {
 }
 .media-preview {
   display:flex;
+  flex-wrap:wrap;
   gap:7px;
   overflow:auto;
   margin-top:9px
@@ -457,6 +461,7 @@ body {
 .media-preview:empty {
   display:none
 }
+.media-preview-item { display:grid; align-content:start; gap:6px; min-width:0; }
 .media-preview img,.media-preview video {
   width:96px;
   height:54px;
@@ -464,6 +469,32 @@ body {
   border:1px solid var(--line);
   background:#07141c
 }
+.media-caption-toggle { min-height:28px; padding:0 8px; font-size:9px; }
+.media-caption-fields { display:grid; gap:8px; width:min(290px,72vw); padding-top:4px; }
+.media-caption-fields[hidden] { display:none; }
+.media-caption-fields .field { gap:4px; font-size:9px; }
+.media-caption-fields textarea { min-height:52px; }
+.admin-content { min-width:0; }
+.admin-layout.is-site-settings { grid-template-columns:minmax(0,1fr); }
+.admin-layout.is-site-settings .library { display:none; }
+.admin-tabs { display:flex; flex-wrap:wrap; gap:8px; padding:22px clamp(22px,3vw,46px) 0; }
+.admin-tab { min-height:38px; padding:0 14px; border:1px solid var(--line); background:transparent; color:var(--muted); font:inherit; font-size:10px; cursor:pointer; }
+.admin-tab.is-active { border-color:var(--blue); background:rgba(126,165,193,.12); color:var(--white); }
+.admin-content [hidden] { display:none !important; }
+.site-settings { min-width:0; padding:24px clamp(22px,3vw,46px) 46px; }
+.home-image-field { display:grid; gap:8px; margin:20px 0 26px; }
+.home-image-field small { color:var(--muted); font-size:11px; }
+.home-image-field .media-preview-item { width:min(380px,100%); }
+.site-settings .section-heading h2 { margin:0; font:400 clamp(25px,3vw,35px) Georgia,"Times New Roman",serif; }
+.language-columns { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-top:24px; }
+.language-column { display:grid; align-content:start; gap:15px; min-width:0; padding:18px; border:1px solid var(--line); background:rgba(198,220,235,.025); }
+.language-column h3 { margin:0 0 3px; color:var(--blue); font:400 20px Georgia,"Times New Roman",serif; }
+.experience-editor { margin:22px 0; padding:18px; border:1px solid var(--line); }
+.collaborator-fields { padding:14px; border:1px solid var(--line); background:rgba(198,220,235,.025); }
+.collaborator-fields__title { margin:0 0 10px; color:var(--blue); font-size:11px; }
+.experience-editor legend { padding:0 8px; color:var(--blue); }
+.site-toggle { display:flex; align-items:center; gap:10px; margin:20px 0; color:var(--pale); font-size:11px; }
+.site-toggle input { accent-color:#7ea5c1; }
 .save-bar {
   position:sticky;
   bottom:0;
@@ -502,9 +533,11 @@ code {
   .admin-layout {
     grid-template-columns:245px minmax(0,1fr)
   }
+  .site-settings { padding:24px 25px 36px; }
   .editor {
     padding:25px
   }
+  .site-settings { padding:22px 16px 30px; }
   .editor__head {
     align-items:flex-start;
     flex-direction:column
@@ -553,6 +586,8 @@ code {
   .field--wide {
     grid-column:auto
   }
+  .language-columns { grid-template-columns:1fr; }
+  .admin-tabs { padding:18px 16px 0; }
   .editor__actions {
     flex-wrap:wrap
   }

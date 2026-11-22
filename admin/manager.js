@@ -1,7 +1,16 @@
 (() => {
   "use strict";
   const form = document.querySelector("#project-form");
+  const siteForm = document.querySelector("#site-settings-form");
+  const homeForm = document.querySelector("#home-settings-form");
   const list = document.querySelector("#project-list");
+  const library = document.querySelector(".library");
+  const editor = document.querySelector(".editor");
+  const siteSettings = document.querySelector("#site-settings-panel");
+  const homeSettings = document.querySelector("#home-settings-panel");
+  const adminLayout = document.querySelector(".admin-layout");
+  const mediaGrid = document.querySelector(".media-grid");
+  const adminTabs = [...document.querySelectorAll("[data-admin-tab]")];
   const notice = document.querySelector("#notice");
   const state = { data: null, currentId: null, saving: false };
   const $ = (s, root = document) => root.querySelector(s);
@@ -21,6 +30,20 @@
     notice.classList.toggle("is-error", error);
     window.clearTimeout(flash.timer);
     flash.timer = window.setTimeout(() => { notice.hidden = true; }, error ? 7000 : 4000);
+  }
+  function setAdminTab(name) {
+    const onProjects = name === "projects";
+    const onHome = name === "home";
+    editor.hidden = !onProjects;
+    homeSettings.hidden = !onHome;
+    siteSettings.hidden = onProjects || onHome;
+    library.hidden = !onProjects;
+    adminLayout.classList.toggle("is-site-settings", !onProjects);
+    adminTabs.forEach(tab => {
+      const active = tab.dataset.adminTab === name;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
   }
   async function request(url, body) {
     const response = await fetch(url, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : { cache: "no-store" });
@@ -63,6 +86,8 @@
     val("order", project?.order ?? Math.max(0, ...state.data.PROJECTS.map(p => Number(p.order || 0))) + 1);
     val("cvPriority", project?.cvPriority ?? 10);
     val("type", project?.type || "");
+    val("collaboratorName", project?.collaborator?.name || "");
+    val("collaboratorUrl", project?.collaborator?.url || "");
     val("status", project?.status || "in-development");
     val("roleFR", textFor(project?.role, "fr"));
     val("roleEN", textFor(project?.role, "en"));
@@ -78,6 +103,7 @@
     checked("visible", project ? project.visible !== false : true);
     renderSoftwarePicker(project?.software || []);
     $$('input[name="category"]', form).forEach(input => { input.checked = Boolean(project?.categories?.includes(input.value)); });
+    $('[data-collaborator-fields]').hidden = form.elements.namedItem("type").value !== "collaboration";
     const isNew = !project;
     $("#editor-title").textContent = isNew ? "Nouveau projet" : "Modifier · " + project.title;
     $("#preview-project").disabled = isNew;
@@ -125,6 +151,9 @@
       technicalNotes: { fr: form.elements.namedItem("objectiveFR").value.trim(), en: form.elements.namedItem("objectiveEN").value.trim() },
       software: $$('input[name="software"]:checked', form).map(input => input.value),
       credits,
+      collaborator: form.elements.namedItem("type").value === "collaboration" && form.elements.namedItem("collaboratorName").value.trim()
+        ? { name: form.elements.namedItem("collaboratorName").value.trim(), url: form.elements.namedItem("collaboratorUrl").value.trim() }
+        : null,
       featured: form.elements.namedItem("featured").checked,
       visible: form.elements.namedItem("visible").checked
     };
@@ -150,19 +179,27 @@
     return project;
   }
   function mediaPath(item) { return item?.src || item || ""; }
-  function addPreview(container, path, video = false) {
+  function addPreview(container, path, video = false, captionTarget = null) {
     if (!path) return;
+    const item = document.createElement("div");
+    item.className = "media-preview-item";
     const element = document.createElement(video ? "video" : "img");
     element.src = "/" + path;
     if (video) { element.controls = true; element.muted = true; }
     else element.alt = "Aperçu du média";
-    container.appendChild(element);
+    item.appendChild(element);
+    if (captionTarget) {
+      item.dataset.captionKind = captionTarget.kind;
+      item.dataset.captionIndex = String(captionTarget.index ?? "");
+      item.innerHTML += '<button class="button button--quiet media-caption-toggle" type="button" data-caption-toggle>Légender</button><div class="media-caption-fields" data-caption-fields hidden><label class="field"><span>Commentaire — français</span><textarea name="captionFR" rows="2">' + esc(textFor(captionTarget.caption, "fr")) + '</textarea></label><label class="field"><span>Caption — English</span><textarea name="captionEN" rows="2">' + esc(textFor(captionTarget.caption, "en")) + '</textarea></label><button class="button button--blue" type="button" data-caption-save>Enregistrer</button></div>';
+    }
+    container.appendChild(item);
   }
   function refreshPreviews(project = state.data.PROJECTS.find(item => item.id === state.currentId)) {
     $$('[data-preview]').forEach(node => { node.replaceChildren(); });
     $$('[data-media-result]').forEach(node => { node.textContent = node.dataset.mediaResult + " · aucun fichier ajouté"; });
     if (!project) return;
-    addPreview($('[data-preview="cover"]'), project.thumbnail);
+    addPreview($('[data-preview="cover"]'), project.thumbnail, false, { kind: "cover", caption: project.thumbnailCaption });
     const gallery = project.gallery || [];
     const groups = {
       still: gallery.filter(item => /still-/.test(mediaPath(item))),
@@ -170,14 +207,40 @@
       workflow: gallery.filter(item => /workflow-/.test(mediaPath(item))),
       bts: gallery.filter(item => /bts-/.test(mediaPath(item)))
     };
-    Object.keys(groups).forEach(key => groups[key].slice(-4).forEach(item => addPreview($('[data-preview="' + key + '"]'), mediaPath(item))));
+    Object.keys(groups).forEach(key => groups[key].slice(-4).forEach(item => addPreview($('[data-preview="' + key + '"]'), mediaPath(item), false, { kind: "gallery", index: project.gallery.indexOf(item), caption: item.caption })));
     const comparisons = project.comparisons || [];
-    comparisons.slice(-1).forEach(item => { addPreview($('[data-preview="comparison"]'), item.before); addPreview($('[data-preview="comparison"]'), item.after); });
+    comparisons.forEach((item, index) => { addPreview($('[data-preview="comparison"]'), item.before, false, { kind: "comparison-before", index, caption: item.beforeCaption }); addPreview($('[data-preview="comparison"]'), item.after, false, { kind: "comparison-after", index, caption: item.afterCaption }); });
     const videos = project.videos || [];
-    videos.filter(item => /breakdown-/.test(item.src || "")).slice(-3).forEach(item => addPreview($('[data-preview="breakdown"]'), item.src, true));
-    videos.filter(item => /project\./.test(item.src || "")).slice(-1).forEach(item => addPreview($('[data-preview="film"]'), item.src, true));
+    videos.filter(item => /breakdown-/.test(item.src || "")).slice(-3).forEach(item => addPreview($('[data-preview="breakdown"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
+    videos.filter(item => /project\./.test(item.src || "")).slice(-1).forEach(item => addPreview($('[data-preview="film"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
     const counts = { cover: project.thumbnail ? 1 : 0, still: groups.still.length, technical: groups.technical.length, workflow: groups.workflow.length, bts: groups.bts.length, comparison: comparisons.filter(item => item.before && item.after).length, breakdown: videos.filter(item => /breakdown-/.test(item.src || "")).length, film: videos.filter(item => /project\./.test(item.src || "")).length };
     Object.entries(counts).forEach(([key, count]) => { const node = $('[data-media-result="' + key + '"]'); if (node && count) node.textContent = count + (count > 1 ? " fichier(s) ajouté(s)" : " fichier ajouté"); });
+  }
+  function setSiteForm() {
+    if (!siteForm || !state.data) return;
+    const site = state.data.SITE;
+    const set = (name, value) => { const field = siteForm.elements.namedItem(name); if (field) field.value = value ?? ""; };
+    set("bioFR", textFor(site.bio, "fr")); set("bioEN", textFor(site.bio, "en"));
+    (site.about?.sections || []).forEach((section, index) => {
+      set("aboutTitleFR" + index, textFor(section.title, "fr")); set("aboutTitleEN" + index, textFor(section.title, "en"));
+      set("aboutBodyFR" + index, (section.body?.fr || []).join("\n\n")); set("aboutBodyEN" + index, (section.body?.en || []).join("\n\n"));
+    });
+    const experience = site.experience?.[0] || {};
+    set("experienceEmployer", experience.employer); set("experienceRoleFR", textFor(experience.role, "fr")); set("experienceRoleEN", textFor(experience.role, "en"));
+    set("experiencePeriodFR", textFor(experience.period, "fr")); set("experiencePeriodEN", textFor(experience.period, "en"));
+    set("experienceDescriptionFR", textFor(experience.description, "fr")); set("experienceDescriptionEN", textFor(experience.description, "en"));
+    set("experienceSkillsFR", (experience.skillsDeveloped?.fr || []).join("\n")); set("experienceSkillsEN", (experience.skillsDeveloped?.en || []).join("\n"));
+    siteForm.elements.namedItem("backgroundEffects").checked = site.backgroundEffects !== false;
+  }
+  function setHomeForm() {
+    if (!homeForm || !state.data) return;
+    const home = state.data.SITE.home || {};
+    const set = (name, value) => { const field = homeForm.elements.namedItem(name); if (field) field.value = value ?? ""; };
+    set("homeIntroFR", textFor(home.intro, "fr")); set("homeIntroEN", textFor(home.intro, "en"));
+    set("homeStatementFR", textFor(home.statement, "fr")); set("homeStatementEN", textFor(home.statement, "en"));
+    const preview = $("[data-home-preview]");
+    preview.replaceChildren();
+    if (state.data.SITE.heroImage) addPreview(preview, state.data.SITE.heroImage);
   }
   function dataUrl(file) {
     return new Promise((resolve, reject) => {
@@ -187,6 +250,28 @@
       reader.readAsDataURL(file);
     });
   }
+  adminTabs.forEach(tab => tab.addEventListener("click", () => setAdminTab(tab.dataset.adminTab)));
+  if (homeForm) homeForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const site = state.data.SITE;
+    const value = name => homeForm.elements.namedItem(name).value.trim();
+    site.home = { intro: { fr: value("homeIntroFR"), en: value("homeIntroEN") }, statement: { fr: value("homeStatementFR"), en: value("homeStatementEN") } };
+    try { await request("/api/save", state.data); flash("Page d’accueil enregistrée."); }
+    catch (error) { flash(error.message, true); }
+  });
+  if (homeForm) homeForm.addEventListener("change", async event => {
+    const input = event.target;
+    if (input.name !== "homeHeroImage" || !input.files?.length) return;
+    input.disabled = true;
+    try {
+      const result = await request("/api/upload-home-image", { filename: input.files[0].name, data: await dataUrl(input.files[0]) });
+      state.data.SITE.heroImage = result.path;
+      await request("/api/save", state.data);
+      setHomeForm();
+      flash("Image principale de l’accueil enregistrée.");
+    } catch (error) { flash(error.message, true); }
+    finally { input.disabled = false; input.value = ""; }
+  });
   function nextPairIndex(project, side) {
     const comparisons = project.comparisons || [];
     const pendingIndex = comparisons.findIndex(item => !item[side]);
@@ -231,11 +316,48 @@
     const id = form.elements.namedItem("id").value;
     if (id) window.open(new URL("/#/project/" + encodeURIComponent(id), window.location.href).href, "_blank", "noopener,noreferrer");
   });
+  if (mediaGrid) mediaGrid.addEventListener("click", async event => {
+    const row = event.target.closest("[data-caption-kind]");
+    if (!row) return;
+    const fields = row.querySelector("[data-caption-fields]");
+    if (event.target.closest("[data-caption-toggle]")) { fields.hidden = !fields.hidden; return; }
+    if (!event.target.closest("[data-caption-save]")) return;
+    const project = state.data.PROJECTS.find(item => item.id === state.currentId);
+    if (!project) return;
+    const caption = { fr: row.querySelector('[name="captionFR"]').value.trim(), en: row.querySelector('[name="captionEN"]').value.trim() };
+    const index = Number(row.dataset.captionIndex);
+    if (row.dataset.captionKind === "cover") project.thumbnailCaption = caption;
+    else if (row.dataset.captionKind === "gallery") project.gallery[index].caption = caption;
+    else if (row.dataset.captionKind === "comparison-before") project.comparisons[index].beforeCaption = caption;
+    else if (row.dataset.captionKind === "comparison-after") project.comparisons[index].afterCaption = caption;
+    else if (row.dataset.captionKind === "video") project.videos[index].caption = caption;
+    try { await request("/api/save", state.data); flash("Commentaire enregistré en français et en anglais."); }
+    catch (error) { flash(error.message, true); }
+  });
+  if (siteForm) siteForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const site = state.data.SITE;
+    const value = name => siteForm.elements.namedItem(name).value.trim();
+    const paragraphs = name => value(name).split(/\r?\n\s*\r?\n/).map(text => text.trim()).filter(Boolean);
+    site.bio = { fr: value("bioFR"), en: value("bioEN") };
+    site.about = { intro: site.bio, sections: [0, 1, 2].map(index => ({
+      title: { fr: value("aboutTitleFR" + index), en: value("aboutTitleEN" + index) },
+      body: { fr: paragraphs("aboutBodyFR" + index), en: paragraphs("aboutBodyEN" + index) }
+    })) };
+    site.experience = [{ employer: value("experienceEmployer"), role: { fr: value("experienceRoleFR"), en: value("experienceRoleEN") }, period: { fr: value("experiencePeriodFR"), en: value("experiencePeriodEN") }, description: { fr: value("experienceDescriptionFR"), en: value("experienceDescriptionEN") }, skillsDeveloped: { fr: lines(value("experienceSkillsFR")), en: lines(value("experienceSkillsEN")) } }].filter(item => item.employer);
+    site.backgroundEffects = siteForm.elements.namedItem("backgroundEffects").checked;
+    try { await request("/api/save", state.data); flash("Page À propos, expérience et fond enregistrés. Recharge le site pour afficher les changements."); }
+    catch (error) { flash(error.message, true); }
+  });
   form.addEventListener("submit", async event => {
     event.preventDefault();
     try { await saveProject(); } catch (error) { flash(error.message, true); }
   });
   form.addEventListener("change", async event => {
+    if (event.target.name === "type") {
+      $('[data-collaborator-fields]').hidden = event.target.value !== "collaboration";
+      return;
+    }
     const input = event.target.closest("[data-upload]");
     if (!input || !input.files?.length) return;
     const type = input.dataset.upload;
@@ -259,6 +381,9 @@
     try {
       state.data = await request("/api/data");
       state.data.PROJECTS.sort(byOrder);
+      setSiteForm();
+      setHomeForm();
+      setAdminTab("projects");
       renderSoftwarePicker();
       renderList();
       setForm(null);

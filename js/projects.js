@@ -1,8 +1,8 @@
 /* Fichier généré depuis data/portfolio.json avec project_manager.mjs. */
 window.SITE = {
   "name": "Max Lelièvre",
-  "location": "Nantes, France · Paris, France",
-  "portrait": "assets/images/general/portrait.jpg",
+  "location": "Nantes / Paris - FRANCE",
+  "portrait": "",
   "portfolioUrl": "",
   "headline": {
     "fr": "Recherche d'opportunités en VFX / Compositing",
@@ -48,6 +48,112 @@ window.SITE = {
     "poster": "",
     "year": "",
     "breakdown": []
+  },
+  "backgroundEffects": true,
+  "about": {
+    "intro": {
+      "fr": "Étudiant en audiovisuel à CinéCréatis Nantes, je serai diplômé à l'été 2027. Je m’intéresse particulièrement à la postproduction, au compositing et aux effets visuels. J’aime comprendre comment une image se construit, explorer les outils techniques et donner vie à des plans en veillant à leur cohérence visuelle.\n\nPassionné de cinéma et notamment de science-fiction, avec un attachement particulier à l’univers de Star Wars, je suis attiré par les images qui repoussent les limites du réel. Cette passion nourrit ma curiosité pour les techniques, les environnements et les effets qui participent à la création d’univers cinématographiques.",
+      "en": "I am an audiovisual student at CinéCréatis Nantes, graduating in summer 2027. I am particularly interested in postproduction, compositing and visual effects. I enjoy understanding how images are built, exploring technical tools and bringing shots to life while maintaining visual consistency.\n\nPassionate about cinema and science fiction, particularly the Star Wars universe, I am drawn to images that push the boundaries of reality. This passion fuels my curiosity for the techniques, environments and visual effects involved in creating cinematic worlds."
+    },
+    "sections": [
+      {
+        "title": {
+          "fr": "Direction professionnelle",
+          "en": "Professional direction"
+        },
+        "body": {
+          "fr": [
+            "Développer une pratique du compositing et de la postproduction, en travaillant à la fois la technique et la composition de l’image.",
+            "L’objectif est de rejoindre un studio de postproduction ou de VFX pour un stage, et de contribuer à des projets où l’effet sert le récit."
+          ],
+          "en": [
+            "Building a compositing and postproduction practice, working on both technique and image composition.",
+            "The goal is to join a postproduction or VFX studio for an internship and contribute to projects where the effect serves the story."
+          ]
+        }
+      },
+      {
+        "title": {
+          "fr": "Postproduction",
+          "en": "Postproduction"
+        },
+        "body": {
+          "fr": [
+            "Sur ALMD — The Last of Us, j’ai occupé le poste de directeur de postproduction et conçu les cartons-titres. Sur OLT — ESMA, j’interviens en direction de la postproduction ainsi que sur des interventions VFX, notamment du cleaning.",
+            "Ces projets m’ont permis de travailler à l’articulation entre organisation de la postproduction et fabrication des images."
+          ],
+          "en": [
+            "On ALMD — The Last of Us, I worked as director of postproduction and designed the film’s title cards. On OLT — ESMA, I work in postproduction direction as well as on VFX interventions, including cleaning.",
+            "These projects have given me experience in the relationship between postproduction organisation and image work."
+          ]
+        }
+      },
+      {
+        "title": {
+          "fr": "VFX & compositing",
+          "en": "VFX & compositing"
+        },
+        "body": {
+          "fr": [
+            "Sur EURYDICE, j’interviens comme VFX artist en préproduction. Les recherches, les tests et les intégrations seront présentés lorsque les images seront validées.",
+            "Ce projet me permet d’aborder les effets visuels en amont, avec une attention particulière portée à l’intégration des effets dans le plan."
+          ],
+          "en": [
+            "On EURYDICE, I work as a VFX artist in preproduction. Research, tests and integrations will be presented once the visuals are approved.",
+            "The project lets me approach visual effects early in the process, with a particular focus on how effects sit within the shot."
+          ]
+        }
+      }
+    ]
+  },
+  "experience": [
+    {
+      "employer": "Super U",
+      "role": {
+        "fr": "Emploi salarié en parallèle des études",
+        "en": "Part-time work alongside studies"
+      },
+      "period": {
+        "fr": "Depuis 3 ans",
+        "en": "For 3 years"
+      },
+      "description": {
+        "fr": "Expérience comme employé commercial et hôte d’accueil menée en parallèle des études.",
+        "en": "Experience as a retail assistant and customer host alongside my studies."
+      },
+      "skillsDeveloped": {
+        "fr": [
+          "Sens du service client",
+          "Communication",
+          "Travail en équipe",
+          "Capacité d’adaptation",
+          "Rigueur",
+          "Organisation",
+          "Attention aux détails",
+          "Respect des délais et de la qualité attendue"
+        ],
+        "en": [
+          "Customer service",
+          "Communication",
+          "Teamwork",
+          "Adaptability",
+          "Accuracy",
+          "Organisation",
+          "Attention to detail",
+          "Meeting deadlines and quality standards"
+        ]
+      }
+    }
+  ],
+  "home": {
+    "intro": {
+      "fr": "Étudiant en audiovisuel spécialisé en postproduction et effets visuels, je développe mon approche du compositing à travers des projets audiovisuels, des expérimentations techniques et des collaborations de production.",
+      "en": "Film and audiovisual student focused on postproduction and visual effects, developing my compositing skills through audiovisual projects, technical experiments and production collaborations."
+    },
+    "statement": {
+      "fr": "Postproduction, compositing et effets visuels — au service du plan et du récit.",
+      "en": "Postproduction, compositing and visual effects — in service of the shot and the story."
+    }
   }
 };
 window.PROJECTS = [
@@ -77,12 +183,12 @@ window.PROJECTS = [
       "en": "Postproduction direction\nCreation and design of the title cards"
     },
     "shortDescription": {
-      "fr": "Projet audiovisuel dans lequel j'ai occupé le poste de directeur de postproduction. J'ai notamment réalisé les cartons-titres du projet.",
-      "en": "Audiovisual project in which I worked as postproduction director. My contribution included the creation and design of the film's title cards."
+      "fr": "Le \"A La Manière De\" est un exercice de recréation cinématographique inspiré de la série The Last of Us. Le projet consiste à reproduire un plan original en travaillant sur la mise en scène, le cadrage, la lumière et l'ambiance, afin de se rapprocher le plus fidèlement possible de la référence.",
+      "en": "“A La Manière De” is a film recreation exercise inspired by the series *The Last of Us*. The project involves recreating an original shot by focusing on staging, framing, lighting, and atmosphere, in order to replicate the original as faithfully as possible."
     },
     "description": {
-      "fr": "Projet audiovisuel dans lequel j'ai occupé le poste de directeur de postproduction. J'ai notamment réalisé les cartons-titres du projet.",
-      "en": "Audiovisual project in which I worked as postproduction director. My contribution included the creation and design of the film's title cards."
+      "fr": "Le \"A La Manière De\" est un exercice de recréation cinématographique inspiré de la série The Last of Us. Le projet consiste à reproduire un plan original en travaillant sur la mise en scène, le cadrage, la lumière et l'ambiance, afin de se rapprocher le plus fidèlement possible de la référence.",
+      "en": "“A La Manière De” is a film recreation exercise inspired by the series *The Last of Us*. The project involves recreating an original shot by focusing on staging, framing, lighting, and atmosphere, in order to replicate the original as faithfully as possible."
     },
     "contributions": [
       {
@@ -107,17 +213,62 @@ window.PROJECTS = [
       "DaVinci Resolve",
       "Pro Tools"
     ],
-    "thumbnail": "",
+    "thumbnail": "assets/images/projects/almd/cover.png",
     "thumbnailAlt": {
-      "fr": "",
-      "en": ""
+      "fr": "Image principale — ALMD — The Last of Us",
+      "en": "Project cover — ALMD — The Last of Us"
     },
-    "hero": "",
+    "hero": "assets/images/projects/almd/cover.png",
     "heroAlt": {
-      "fr": "",
-      "en": ""
+      "fr": "Image principale — ALMD — The Last of Us",
+      "en": "Project cover — ALMD — The Last of Us"
     },
-    "gallery": [],
+    "gallery": [
+      {
+        "src": "assets/images/projects/almd/workflow-02.jpg",
+        "alt": {
+          "fr": "Workflow — ALMD — The Last of Us",
+          "en": "Workflow — ALMD — The Last of Us"
+        },
+        "caption": {
+          "fr": "Planning des équipes pour 3 jours de postproduction. \nGuider le travail afin de rendre le projet dans les délais.",
+          "en": "Team schedule for 3 days of post-production.\nOversee the work to ensure the project is delivered on time."
+        }
+      },
+      {
+        "src": "assets/images/projects/almd/bts-01.jpg",
+        "alt": {
+          "fr": "Coulisses — ALMD — The Last of Us",
+          "en": "Behind the scenes — ALMD — The Last of Us"
+        },
+        "caption": {
+          "fr": "Coulisses",
+          "en": "Behind the scenes"
+        }
+      },
+      {
+        "src": "assets/images/projects/almd/still-01.png",
+        "alt": {
+          "fr": "Image du projet — ALMD — The Last of Us",
+          "en": "Project still — ALMD — The Last of Us"
+        },
+        "caption": {
+          "fr": "Image du projet",
+          "en": "Project still"
+        }
+      },
+      {
+        "src": "assets/images/projects/almd/capture-01.png",
+        "alt": {
+          "fr": "Capture technique — ALMD — The Last of Us",
+          "en": "Technical capture — ALMD — The Last of Us"
+        },
+        "caption": {
+          "fr": "Les cartons titres on été réaliser sur AfterEffect.",
+          "en": "The title cards were created in After Effects."
+        }
+      }
+    ],
     "videos": [
       {
         "type": "file",
@@ -125,29 +276,53 @@ window.PROJECTS = [
         "title": {
           "fr": "Extrait du projet",
           "en": "Project excerpt"
+        },
+        "caption": {
+          "fr": "Rien à dire",
+          "en": "Nothing to say"
         }
       }
     ],
     "breakdown": [],
-    "comparisons": [],
+    "comparisons": [
+      {
+        "label": {
+          "fr": "Avant / après",
+          "en": "Before / after"
+        },
+        "after": "assets/images/projects/almd/before-after-01-after.png",
+        "before": "assets/images/projects/almd/before-after-01-before.png",
+        "beforeCaption": {
+          "fr": "Image issue de la série original - \" The Last of Us\"",
+          "en": "Image from the original series—“The Last of Us”"
+        },
+        "afterCaption": {
+          "fr": "Image issue de la recréation.",
+          "en": "Image from the recreation."
+        }
+      }
+    ],
     "technicalNotes": {
       "fr": "",
       "en": ""
     },
     "order": 1,
-    "titleEN": ""
+    "titleEN": "",
+    "collaborator": null
   },
   {
     "id": "olt",
     "code": "02",
-    "title": "OLT — ESMA",
-    "year": null,
+    "title": "One Last Time  — ESMA",
+    "year": "2026",
     "categories": [
       "vfx",
+      "compositing",
+      "postproduction",
       "cleaning",
-      "postproduction"
+      "tracking"
     ],
-    "type": null,
+    "type": "collaboration",
     "status": "in-development",
     "includeInCV": true,
     "cvPriority": 2,
@@ -160,8 +335,8 @@ window.PROJECTS = [
       "en": "Director of Postproduction / VFX"
     },
     "roleDescription": {
-      "fr": "Direction de la postproduction et interventions VFX, notamment du cleaning.",
-      "en": "Postproduction direction and VFX work, including cleaning."
+      "fr": "Direction de la postproduction\nInterventions VFX\nCleaning",
+      "en": "Postproduction direction\nVFX work\nCleaning"
     },
     "shortDescription": {
       "fr": "Projet en développement avec l'ESMA, sur lequel j'interviens en direction de la postproduction et sur des travaux de VFX, notamment de cleaning.",
@@ -190,7 +365,11 @@ window.PROJECTS = [
       "en": "The shot breakdown and VFX work will be detailed as the project progresses."
     },
     "credits": [],
-    "software": [],
+    "software": [
+      "Nuke",
+      "Premiere Pro",
+      "Maya"
+    ],
     "thumbnail": "",
     "thumbnailAlt": {
       "fr": "",
@@ -205,20 +384,26 @@ window.PROJECTS = [
     "videos": [],
     "breakdown": [],
     "comparisons": [],
-    "technicalNotes": null,
-    "order": 2
+    "technicalNotes": {
+      "fr": "",
+      "en": ""
+    },
+    "order": 2,
+    "titleEN": ""
   },
   {
     "id": "eurydice",
     "code": "03",
     "title": "EURYDICE",
-    "year": null,
+    "year": "2026",
     "categories": [
       "vfx",
       "compositing",
-      "science-fiction"
+      "cleaning",
+      "tracking",
+      "rotoscoping"
     ],
-    "type": null,
+    "type": "student",
     "status": "preproduction",
     "includeInCV": true,
     "cvPriority": 3,
@@ -239,8 +424,8 @@ window.PROJECTS = [
       "en": "Science-fiction short film on which I work as a VFX artist."
     },
     "description": {
-      "fr": "Projet de court métrage de science-fiction dans lequel je suis chargé des VFX. Le projet implique des recherches visuelles, de la préparation technique, des intégrations et du compositing.",
-      "en": "Science-fiction short film on which I work as a VFX artist. The project involves visual research, technical preparation, compositing and visual effects integration."
+      "fr": "Projet de court métrage de science-fiction dans lequel je suis chargé des VFX.",
+      "en": "Science-fiction short film on which I work as a VFX artist."
     },
     "contributions": [],
     "note": {
@@ -248,7 +433,13 @@ window.PROJECTS = [
       "en": "Project in preproduction. Research, technical tests and breakdowns will be published once the visuals are approved."
     },
     "credits": [],
-    "software": [],
+    "software": [
+      "Nuke",
+      "After Effects",
+      "Photoshop",
+      "Premiere Pro",
+      "Blender"
+    ],
     "thumbnail": "",
     "thumbnailAlt": {
       "fr": "",
@@ -263,17 +454,21 @@ window.PROJECTS = [
     "videos": [],
     "breakdown": [],
     "comparisons": [],
-    "technicalNotes": null,
-    "order": 3
+    "technicalNotes": {
+      "fr": "",
+      "en": ""
+    },
+    "order": 3,
+    "titleEN": ""
   },
   {
     "id": "ffde",
     "code": "04",
     "title": "FFDE",
-    "year": null,
+    "year": "2026",
     "categories": [],
-    "type": null,
-    "status": "draft",
+    "type": "student",
+    "status": "preproduction",
     "featured": false,
     "visible": false,
     "role": {
@@ -297,8 +492,17 @@ window.PROJECTS = [
     "videos": [],
     "breakdown": [],
     "comparisons": [],
-    "technicalNotes": null,
-    "order": 4
+    "technicalNotes": {
+      "fr": "",
+      "en": ""
+    },
+    "order": 4,
+    "titleEN": "",
+    "cvPriority": 10,
+    "roleDescription": {
+      "fr": "",
+      "en": ""
+    }
   }
 ];
 window.SOFTWARE_CATALOG = [
