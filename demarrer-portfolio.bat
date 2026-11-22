@@ -8,7 +8,7 @@ echo Gestionnaire : http://127.0.0.1:8765/admin/
 echo Apercu du site : http://127.0.0.1:8765/
 echo.
 
-node "%~dp0project_manager.mjs"
+node "%~dp0project_manager.mjs" --open
 set "SERVER_EXIT=%ERRORLEVEL%"
 
 if not "%SERVER_EXIT%"=="0" (

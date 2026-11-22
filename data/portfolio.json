@@ -31,11 +31,11 @@
     ],
     "software": [],
     "skills": [],
-    "email": "",
+    "email": "maxlelievre18@gmail.com",
     "phone": "",
-    "linkedin": "",
+    "linkedin": "https://www.linkedin.com/in/max-lelievre/",
     "vimeo": "",
-    "youtube": "",
+    "youtube": "https://youtube.com/@maxlelievre-gi1on?si=Tvg5pA5bmWALsOWW",
     "cv": "",
     "heroImage": "",
     "heroImageAlt": {
@@ -55,12 +55,12 @@
       "id": "almd",
       "code": "01",
       "title": "ALMD — The Last of Us",
-      "year": null,
+      "year": "2025",
       "categories": [
         "postproduction",
-        "title-design"
+        "motion-design"
       ],
-      "type": null,
+      "type": "student",
       "status": "completed",
       "includeInCV": true,
       "cvPriority": 1,
@@ -73,8 +73,8 @@
         "en": "Director of Postproduction"
       },
       "roleDescription": {
-        "fr": "Direction de la postproduction et conception des cartons-titres.",
-        "en": "Postproduction direction and title card design."
+        "fr": "Direction de la postproduction\nCréation et conception des cartons-titres",
+        "en": "Postproduction direction\nCreation and design of the title cards"
       },
       "shortDescription": {
         "fr": "Projet audiovisuel dans lequel j'ai occupé le poste de directeur de postproduction. J'ai notamment réalisé les cartons-titres du projet.",
@@ -99,7 +99,14 @@
         "en": "Title card stills, the animated title sequence and production credits will be added soon."
       },
       "credits": [],
-      "software": [],
+      "software": [
+        "After Effects",
+        "Premiere Pro",
+        "Illustrator",
+        "Blender",
+        "DaVinci Resolve",
+        "Pro Tools"
+      ],
       "thumbnail": "",
       "thumbnailAlt": {
         "fr": "",
@@ -111,11 +118,24 @@
         "en": ""
       },
       "gallery": [],
-      "videos": [],
+      "videos": [
+        {
+          "type": "file",
+          "src": "assets/videos/projects/almd/project.mp4",
+          "title": {
+            "fr": "Extrait du projet",
+            "en": "Project excerpt"
+          }
+        }
+      ],
       "breakdown": [],
       "comparisons": [],
-      "technicalNotes": null,
-      "order": 1
+      "technicalNotes": {
+        "fr": "",
+        "en": ""
+      },
+      "order": 1,
+      "titleEN": ""
     },
     {
       "id": "olt",

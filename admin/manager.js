@@ -229,7 +229,7 @@
   $("#new-project").addEventListener("click", () => { state.currentId = null; setForm(null); window.scrollTo({ top: 0, behavior: "smooth" }); });
   $("#preview-project").addEventListener("click", () => {
     const id = form.elements.namedItem("id").value;
-    if (id) window.open("/#/project/" + encodeURIComponent(id), "_blank", "noopener");
+    if (id) window.open(new URL("/#/project/" + encodeURIComponent(id), window.location.href).href, "_blank", "noopener,noreferrer");
   });
   form.addEventListener("submit", async event => {
     event.preventDefault();

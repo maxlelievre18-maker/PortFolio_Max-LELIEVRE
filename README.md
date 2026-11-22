@@ -1,6 +1,6 @@
 # Portfolio de Max Lelièvre
 
-Site portfolio statique français / anglais, prêt pour GitHub Pages. Les pages publiques n’utilisent ni framework, ni API, ni service payant. Un gestionnaire local sans dépendance est fourni pour créer et modifier les fiches et copier leurs médias dans le projet. Node.js 18 ou plus récent est requis pour l’interface de gestion ; les visiteurs du site n’en ont pas besoin.
+Site portfolio statique français / anglais, prêt pour GitHub Pages. Les pages publiques n’utilisent ni framework, ni API, ni service payant. Un gestionnaire local sans dépendance est fourni pour créer et modifier les fiches et copier leurs médias dans le projet. Node.js 18 ou plus récent est requis pour l’interface de gestion ; Microsoft Edge sert à régénérer les PDF ; les visiteurs du site n’ont besoin ni de Node.js ni d’Edge.
 
 ## Démarrer l’interface locale
 
@@ -11,7 +11,7 @@ Site portfolio statique français / anglais, prêt pour GitHub Pages. Les pages 
    node project_manager.mjs
    ```
 
-3. Ouvre l’adresse affichée, généralement [http://127.0.0.1:8765/admin/](http://127.0.0.1:8765/admin/).
+3. Le lanceur ouvre automatiquement l’interface de gestion et le portfolio dans ton navigateur. Sinon, va à [http://127.0.0.1:8765/admin/](http://127.0.0.1:8765/admin/).
 4. Après tes changements, arrête le serveur avec `Ctrl+C`. Le gestionnaire ne fonctionne que sur cet ordinateur ; il ne publie rien sur Internet.
 
 Le site de prévisualisation locale est servi sur [http://127.0.0.1:8765/](http://127.0.0.1:8765/). Depuis la fiche d’un projet, le bouton « Aperçu du site » ouvre directement sa page.
@@ -62,8 +62,8 @@ Les informations communes du profil sont dans `data/portfolio.json`, sous `SITE`
 
 Pour le portrait, ajoute le fichier `assets/images/general/portrait.jpg` et renseigne `SITE.portrait` avec son chemin. Les compétences et logiciels vides ne sont pas inventés ni affichés.
 
-Le CV dynamique est accessible par « CV » dans la navigation et par le bouton de la page À propos. Il reprend les titres, dates, rôles, contributions, images, statuts et logos de logiciels saisis dans les fiches projet. Il suit le sélecteur FR / EN. Clique sur « Exporter PDF / Imprimer le CV », puis choisis « Enregistrer au format PDF » dans la boîte d’impression et le papier A4 portrait.
+Le CV PDF est accessible par « CV » dans la navigation et par le bouton de la page À propos. La page du lecteur affiche un aperçu du PDF dans le navigateur et un bouton de téléchargement. Le gestionnaire génère un PDF français et un PDF anglais au démarrage, puis les met à jour à chaque sauvegarde de fiche. Les fichiers sont enregistrés dans `output/pdf/` ; attends les messages « CV PDF FR généré » et « CV PDF EN généré » dans la fenêtre du serveur avant de publier. Le PDF reprend les titres, dates, rôles, contributions, images, statuts et logos de logiciels présents dans les fiches. Pour un export manuel, l’aperçu de secours `index.html#/cv` s’imprime en A4 via « Enregistrer au format PDF ».
 
 ## Publier sur GitHub Pages
 
-Après avoir vérifié le site sur `http://127.0.0.1:8765/`, arrête le gestionnaire. Vérifie que `data/portfolio.json`, `js/projects.js` et les nouveaux médias sont inclus dans tes changements. Fais ton commit et pousse-les sur GitHub. Dans les paramètres du dépôt, active GitHub Pages sur la branche et le dossier contenant `index.html` (souvent la racine). Les visiteurs n’ont pas besoin de Node.js : le site publié reste entièrement statique.
+Après avoir vérifié le site sur `http://127.0.0.1:8765/`, arrête le gestionnaire. Vérifie que `data/portfolio.json`, `js/projects.js`, `output/pdf/` et les nouveaux médias sont inclus dans tes changements. Fais ton commit et pousse-les sur GitHub. Dans les paramètres du dépôt, active GitHub Pages sur la branche et le dossier contenant `index.html` (souvent la racine). Les visiteurs n’ont pas besoin de Node.js : le site publié reste entièrement statique.

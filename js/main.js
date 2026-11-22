@@ -54,7 +54,7 @@
     { key: "projects", name: "projects", href: "#/projects" },
     { key: "showreel", name: "showreel", href: "#/showreel" },
     { key: "about", name: "about", href: "#/about" },
-    { key: "cv", name: "cv", href: "#/cv" },
+    { key: "cv", name: "cv", href: "cv-viewer.html" },
     { key: "contact", name: "contact", href: "#/contact" }
   ];
 
@@ -65,6 +65,8 @@
   const $$ = (selector, root) => Array.from((root || document).querySelectorAll(selector));
 
   function readLang() {
+    const requested = new URLSearchParams(window.location.search).get("lang");
+    if (requested === "fr" || requested === "en") return requested;
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === "fr" || saved === "en") return saved;
@@ -205,6 +207,10 @@
     return route.name + (route.id ? "/" + route.id : "");
   }
 
+  function navHref(item) {
+    return item.name === "cv" ? "cv-viewer.html?lang=" + state.lang : item.href;
+  }
+
   function setMeta(title, description) {
     document.title = title;
     const descriptionTag = document.querySelector('meta[name="description"]');
@@ -255,7 +261,7 @@
           '<nav class="header__nav" aria-label="' + esc(t("nav.primary")) + '">' +
             NAV.map(function (item) {
               const current = activeNav(item);
-              return '<a class="header__link' + (current ? " is-active" : "") + '" href="' + item.href + '"' +
+              return '<a class="header__link' + (current ? " is-active" : "") + '" href="' + navHref(item) + '"' +
                 (current ? ' aria-current="page"' : "") + '>' + esc(t("nav." + item.key)) + '</a>';
             }).join("") +
           '</nav>' +
@@ -277,7 +283,7 @@
           '<nav class="mobile-menu__nav" aria-label="' + esc(t("nav.mobile")) + '">' +
             NAV.map(function (item, index) {
               const current = activeNav(item);
-              return '<a class="mobile-menu__link' + (current ? " is-active" : "") + '" href="' + item.href + '"' +
+              return '<a class="mobile-menu__link' + (current ? " is-active" : "") + '" href="' + navHref(item) + '"' +
                 (current ? ' aria-current="page"' : "") + '>' +
                 '<span class="mobile-menu__index">0' + (index + 1) + '</span>' +
                 '<span class="mobile-menu__label">' + esc(t("nav." + item.key)) + '</span>' +
@@ -316,7 +322,7 @@
               '<h2 class="footer__title">' + esc(t("footer.navTitle")) + '</h2>' +
               '<ul class="footer__list">' +
                 NAV.map(function (item) {
-                  return '<li><a class="footer__link" href="' + item.href + '">' + esc(t("nav." + item.key)) + '</a></li>';
+                  return '<li><a class="footer__link" href="' + navHref(item) + '">' + esc(t("nav." + item.key)) + '</a></li>';
                 }).join("") +
               '</ul>' +
             '</nav>' +
@@ -1385,7 +1391,7 @@
               '<p class="cv-panel__text">' + esc(t("about.cvText")) + '</p>' +
             '</div>' +
             '<div class="cv-panel__action">' +
-              '<a class="btn btn--primary" href="#/cv">' + esc(t("about.cvButton")) + '<span aria-hidden="true">↓</span></a>' +
+              '<a class="btn btn--primary" href="cv-viewer.html?lang=' + state.lang + '">' + esc(t("about.cvButton")) + '<span aria-hidden="true">↓</span></a>' +
             '</div>' +
           '</section>' +
           '<section class="about-contact" data-reveal aria-labelledby="about-contact-title">' +
@@ -1424,7 +1430,7 @@
     const lang = state.lang;
     const labels = lang === "fr" ? { profile: "Profil", skills: "Compétences", software: "Logiciels", education: "Formation", projects: "Projets", contact: "Contact", print: "Exporter PDF / Imprimer le CV", back: "Retour au portfolio", year: "Année à préciser" } : { profile: "Profile", skills: "Skills", software: "Software", education: "Education", projects: "Projects", contact: "Contact", print: "Export PDF / Print CV", back: "Back to portfolio", year: "Year to be confirmed" };
     const portrait = SITE.portrait ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait) + '" alt="" onerror="this.hidden=true">' : '';
-    const contact = [SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + '</a>' : '', SITE.phone ? '<a href="tel:' + esc(SITE.phone) + '">' + esc(SITE.phone) + '</a>' : '', SITE.linkedin ? '<a href="' + esc(SITE.linkedin) + '">LinkedIn</a>' : '', SITE.portfolioUrl ? '<a href="' + esc(SITE.portfolioUrl) + '">' + esc(SITE.portfolioUrl.replace(/^https?:\/\//, "")) + '</a>' : ''].filter(Boolean).join('<span>·</span>');
+    const contact = [SITE.email ? '<a href="mailto:' + esc(SITE.email) + '">' + esc(SITE.email) + '</a>' : '', SITE.phone ? '<a href="tel:' + esc(SITE.phone) + '">' + esc(SITE.phone) + '</a>' : '', SITE.linkedin ? '<a href="' + esc(SITE.linkedin) + '">LinkedIn</a>' : '', SITE.youtube ? '<a href="' + esc(SITE.youtube) + '">YouTube</a>' : '', SITE.portfolioUrl ? '<a href="' + esc(SITE.portfolioUrl) + '">' + esc(SITE.portfolioUrl.replace(/^https?:\/\//, "")) + '</a>' : ''].filter(Boolean).join('<span>·</span>');
     const projects = cvProjects();
     return '<div class="cv-toolbar"><a class="btn btn--ghost" href="#/">← ' + esc(labels.back) + '</a>' + langSwitcher("lang-switch--cv") + '<button class="btn btn--primary" type="button" data-print-cv>' + esc(labels.print) + '</button></div>' +
       '<article class="cv-sheet" aria-label="CV ' + esc(SITE.name) + '">' +

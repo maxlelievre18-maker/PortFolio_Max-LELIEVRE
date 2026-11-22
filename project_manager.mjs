@@ -1,7 +1,9 @@
 import { createServer } from "node:http";
-import { readFile, writeFile, mkdir, stat, readdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, stat, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { spawn } from "node:child_process";
+import { tmpdir } from "node:os";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const HOST = "127.0.0.1";
@@ -9,6 +11,8 @@ const PORT = 8765;
 const MAX_FILE = 120 * 1024 * 1024;
 const DATA_FILE = path.join(ROOT, "data", "portfolio.json");
 const JS_FILE = path.join(ROOT, "js", "projects.js");
+const PDF_DIR = path.join(ROOT, "output", "pdf");
+let pdfTimer;
 const MEDIA = {
   cover: ["images", "cover"], still: ["images", "still"],
   before: ["images", "before-after", "before"], after: ["images", "before-after", "after"],
@@ -17,7 +21,7 @@ const MEDIA = {
 };
 const MIME = {
   ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8", ".svg": "image/svg+xml", ".webp": "image/webp",
+  ".json": "application/json; charset=utf-8", ".pdf": "application/pdf", ".svg": "image/svg+xml", ".webp": "image/webp",
   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".avif": "image/avif",
   ".mp4": "video/mp4", ".webm": "video/webm", ".mov": "video/quicktime"
 };
@@ -86,6 +90,68 @@ async function upload(payload) {
   await writeFile(full, bytes);
   return { ok: true, path: path.relative(ROOT, full).replaceAll("\\", "/"), size: bytes.length };
 }
+async function findEdge() {
+  const candidates = [
+    process.env["ProgramFiles(x86)"] && path.join(process.env["ProgramFiles(x86)"], "Microsoft", "Edge", "Application", "msedge.exe"),
+    process.env.ProgramFiles && path.join(process.env.ProgramFiles, "Microsoft", "Edge", "Application", "msedge.exe"),
+    process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, "Microsoft", "Edge", "Application", "msedge.exe")
+  ].filter(Boolean);
+  for (const candidate of candidates) {
+    try { if ((await stat(candidate)).isFile()) return candidate; } catch {}
+  }
+  return null;
+}
+function runEdge(edgePath, args, lang) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(edgePath, args, { windowsHide: true, stdio: "ignore" });
+    const timeout = setTimeout(() => { child.kill(); reject(new Error("Edge a dépassé le délai de génération du PDF.")); }, 45000);
+    child.once("error", error => { clearTimeout(timeout); reject(error); });
+    child.once("exit", (code, signal) => {
+      clearTimeout(timeout);
+      if (code === 0) resolve();
+      else reject(new Error(`Edge a terminé avec le code ${code ?? signal} pour le CV ${lang.toUpperCase()}.`));
+    });
+  });
+}
+async function generateCVPdfs() {
+  const edgePath = await findEdge();
+  if (!edgePath) {
+    console.warn("Edge n'a pas été détecté : les PDF n'ont pas été régénérés. Tu peux imprimer la page #/cv en PDF.");
+    return;
+  }
+  await mkdir(PDF_DIR, { recursive: true });
+  for (const lang of ["fr", "en"]) {
+    const output = path.join(PDF_DIR, `cv-max-lelievre-${lang}.pdf`);
+    const profile = path.join(tmpdir(), `portfolio-cv-${process.pid}-${lang}-${Date.now()}`);
+    const url = `http://${HOST}:${PORT}/?lang=${lang}#/cv`;
+    try {
+      await runEdge(edgePath, [
+        "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
+        "--disable-extensions", "--no-pdf-header-footer", "--run-all-compositor-stages-before-draw",
+        "--virtual-time-budget=5000", "--window-size=1440,2000", `--user-data-dir=${profile}`,
+        `--print-to-pdf=${output}`, url
+      ], lang);
+      const info = await stat(output);
+      if (info.size < 1000) throw new Error(`Le PDF ${lang.toUpperCase()} semble incomplet.`);
+      console.log(`CV PDF ${lang.toUpperCase()} généré (${Math.round(info.size / 1024)} Ko).`);
+    } catch (error) {
+      console.error(`Échec de génération du PDF ${lang.toUpperCase()} : ${error.message}`);
+    } finally {
+      await rm(profile, { recursive: true, force: true }).catch(() => {});
+    }
+  }
+}
+function queuePdfGeneration() {
+  clearTimeout(pdfTimer);
+  pdfTimer = setTimeout(() => { generateCVPdfs(); }, 900);
+}
+function openLocalPages() {
+  if (!process.argv.includes("--open") || process.platform !== "win32") return;
+  for (const url of [`http://${HOST}:${PORT}/admin/`, `http://${HOST}:${PORT}/`]) {
+    const opener = spawn("cmd.exe", ["/c", "start", "", url], { detached: true, stdio: "ignore", windowsHide: true });
+    opener.unref();
+  }
+}
 async function serve(req, res) {
   try {
     const url = new URL(req.url || "/", `http://${HOST}:${PORT}`);
@@ -94,7 +160,7 @@ async function serve(req, res) {
       const origin = req.headers.origin || "";
       if (origin && origin !== `http://${HOST}:${PORT}`) { json(res, 403, { error: "Origine refusée." }); return; }
       const payload = await body(req);
-      if (url.pathname === "/api/save") { await writeData(payload); json(res, 200, { ok: true }); return; }
+      if (url.pathname === "/api/save") { await writeData(payload); queuePdfGeneration(); json(res, 200, { ok: true }); return; }
       if (url.pathname === "/api/upload") { json(res, 200, await upload(payload)); return; }
       json(res, 404, { error: "Route inconnue." }); return;
     }
@@ -121,4 +187,6 @@ createServer(serve).listen(PORT, HOST, () => {
   console.log(`Gestionnaire local prêt : http://${HOST}:${PORT}/admin/`);
   console.log(`Prévisualisation du site : http://${HOST}:${PORT}/`);
   console.log("Arrête le serveur avec Ctrl+C après utilisation.");
+  queuePdfGeneration();
+  openLocalPages();
 });
