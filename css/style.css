@@ -2061,6 +2061,7 @@ video.video-frame__el {
 .footer__col:last-child { display: flex; flex-direction: column; align-items: flex-start; gap: 1.25rem; }
 .footer__top-link { margin-top: 0; }
 .footer__bottom { justify-content: center; text-align: center; }
+
 .footer__bottom p { margin: 0; }
 .contact-form { display: grid; gap: 1rem; margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--line); }
 .contact-form label { display: grid; gap: .45rem; color: var(--muted-dim); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
@@ -3056,7 +3057,7 @@ a.footer__link:hover {
   }
   body * { visibility: hidden !important; }
   #main, #main * { visibility: visible !important; }
-  #main { position: absolute; top: 0; left: 0; width: 166.667%; height: 471.7mm; overflow: hidden; zoom: .6; margin: 0; padding: 0; }
+  #main { position: static; width: 100%; height: auto; overflow: visible; zoom: 1; margin: 0; padding: 0; }
   .cv-toolbar { display: none !important; }
   .cv-sheet { width: 100%; height: auto; min-height: 0; max-height: none; overflow: visible; margin: 0; padding: 0; box-shadow: none; font-size: 7.5pt; }
   .cv-header { grid-template-columns: 1fr; gap: 2mm; padding-bottom: 3mm; }
@@ -3088,7 +3089,7 @@ a.footer__link:hover {
   .cv-pdf-preview { display:none !important; }
   .cv-project, .cv-education { break-inside: avoid; page-break-inside: avoid; }
   .cv-project img { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-  @page { size: A4 portrait; margin: 7mm; }
+  @page { size: A4 portrait; margin: 20mm; }
 }
 
 @media (max-width: 700px) {
@@ -3107,3 +3108,65 @@ a.footer__link:hover {
 
 .footer__top-link { margin-top: 0; }
 .footer__bottom { justify-content: center; text-align: center; }
+
+/* CV compact : ordre de lecture et mise en page sur une page A4. */
+.cv-sheet { min-height: 0; padding: 12mm; }
+.cv-header { gap: 3mm; padding-bottom: 4mm; }
+.cv-header--with-portrait { grid-template-columns: 1fr 25mm; }
+.cv-header__portrait { width: 25mm; height: 31mm; }
+.cv-header h1 { margin-top: 2mm; font-size: 21pt; }
+.cv-headline { margin-top: 1mm; font-size: 9pt; }
+.cv-contact-box { margin: 0; padding: 1.5mm; gap: 1mm; }
+.cv-contact-box .contact-profile { grid-template-columns: 6mm minmax(0,1fr); padding: 1mm; }
+.cv-contact-box .contact-icon { width: 4mm; height: 4mm; }
+.cv-section { margin-top: var(--cv-section-gap, 2.5mm); }
+.cv-section h2 { margin-bottom: 1.5mm; padding-bottom: 1mm; font-size: 10pt; }
+.cv-section > p, .cv-education, .cv-project { font-size: 8pt; line-height: 1.25; }
+.cv-projects { gap: var(--cv-project-gap, 1.5mm); }
+.cv-project { grid-template-columns: 22mm 1fr; gap: 3mm; }
+.cv-project img, .cv-thumb { width: 22mm; height: 15mm; }
+.cv-experiences { gap: 1mm; }
+.cv-experience { grid-template-columns: 38mm 1fr; gap: 3mm; padding: 1mm 0; font-size: 7.5pt; line-height: 1.2; }
+.cv-experience h3 { font-size: 8.5pt; }
+.cv-experience p { margin-top: 0; }
+.cv-experience__skills { display: block; grid-template-columns: none; margin-top: 1mm !important; padding: 0; color: #13232d; font-size: 6.5pt; line-height: 1.15; }
+
+@media print {
+  #main { position: static; width: 100%; height: auto; overflow: visible; zoom: 1; margin: 0; padding: 0; }
+  .cv-sheet { width: 100%; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+  .cv-header { gap: 3mm; padding-bottom: 4mm; }
+  .cv-header--with-portrait { grid-template-columns: 1fr 25mm; }
+  .cv-header__portrait { width: 25mm; height: 31mm; }
+  .cv-header h1 { margin-top: 2mm; font-size: 22pt; }
+  .cv-headline { font-size: 9pt; }
+  .cv-contact-box { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .cv-contact-box .contact-profile strong { font-size: 7pt; }
+  .cv-section { margin-top: var(--cv-section-gap, 2.5mm); }
+  .cv-section h2 { margin-bottom: 1.5mm; padding-bottom: 1mm; font-size: 10pt; }
+  .cv-section > p, .cv-education, .cv-project { font-size: 9pt; line-height: 1.2; }
+  .cv-projects { gap: var(--cv-project-gap, 1.5mm); }
+  .cv-project { grid-template-columns: 22mm 1fr; gap: 3mm; }
+  .cv-project img, .cv-thumb { width: 22mm; height: 15mm; }
+  .cv-project h3 { font-size: 10pt; }
+  .cv-project__meta, .cv-status { font-size: 8pt !important; }
+  .cv-experiences { gap: 1mm; }
+  .cv-experience { grid-template-columns: 55mm 1fr; gap: 4mm; padding: 1mm 0; font-size: 8pt; line-height: 1.2; }
+  .cv-experience h3 { font-size: 10pt; }
+  .cv-experience__skills { font-size: 7pt; }
+}
+
+@media (max-width: 700px) { .cv-header--with-portrait { grid-template-columns: 1fr 72px; } }
+
+/* A4 visible dans l'onglet CV et lien de portfolio ancre en pied de page. */
+.cv-sheet { width: 210mm; height: 297mm; min-height: 297mm; box-sizing: border-box; display: flex; flex-direction: column; }
+.cv-footer { margin-top: auto; padding-top: 3mm; border-top: 1px solid #c6dceb; color: #46677D; font-size: 8pt; text-align: right; overflow-wrap: anywhere; }
+.cv-footer a { color: inherit; text-decoration: none; }
+
+@media print {
+  .cv-sheet { width: 100%; height: 257mm; min-height: 257mm; transform: scale(.95); transform-origin: center center; }
+  .cv-footer { margin-top: auto; }
+}
+
+@media (max-width: 700px) {
+  .cv-sheet { width: calc(100vw - 24px); height: auto; min-height: 0; aspect-ratio: 210 / 297; }
+}

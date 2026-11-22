@@ -2,11 +2,13 @@
   "use strict";
   const form = document.querySelector("#project-form");
   const siteForm = document.querySelector("#site-settings-form");
+  const cvForm = document.querySelector("#cv-settings-form");
   const homeForm = document.querySelector("#home-settings-form");
   const list = document.querySelector("#project-list");
   const library = document.querySelector(".library");
   const editor = document.querySelector(".editor");
   const siteSettings = document.querySelector("#site-settings-panel");
+  const cvSettings = document.querySelector("#cv-settings-panel");
   const homeSettings = document.querySelector("#home-settings-panel");
   const adminLayout = document.querySelector(".admin-layout");
   const mediaGrid = document.querySelector(".media-grid");
@@ -34,9 +36,11 @@
   function setAdminTab(name) {
     const onProjects = name === "projects";
     const onHome = name === "home";
+    const onCV = name === "cv";
     editor.hidden = !onProjects;
     homeSettings.hidden = !onHome;
-    siteSettings.hidden = onProjects || onHome;
+    siteSettings.hidden = onProjects || onHome || onCV;
+    cvSettings.hidden = !onCV;
     library.hidden = !onProjects;
     adminLayout.classList.toggle("is-site-settings", !onProjects);
     adminTabs.forEach(tab => {
@@ -183,6 +187,7 @@
     if (!path) return;
     const item = document.createElement("div");
     item.className = "media-preview-item";
+    item.dataset.mediaPath = path;
     const element = document.createElement(video ? "video" : "img");
     element.src = "/" + path;
     if (video) { element.controls = true; element.muted = true; }
@@ -193,6 +198,7 @@
       item.dataset.captionIndex = String(captionTarget.index ?? "");
       item.innerHTML += '<button class="button button--quiet media-caption-toggle" type="button" data-caption-toggle>Légender</button><div class="media-caption-fields" data-caption-fields hidden><label class="field"><span>Commentaire — français</span><textarea name="captionFR" rows="2">' + esc(textFor(captionTarget.caption, "fr")) + '</textarea></label><label class="field"><span>Caption — English</span><textarea name="captionEN" rows="2">' + esc(textFor(captionTarget.caption, "en")) + '</textarea></label><button class="button button--blue" type="button" data-caption-save>Enregistrer</button></div>';
     }
+    item.innerHTML += '<button class="button button--quiet media-remove" type="button" data-media-remove>' + (video ? "Retirer la vidéo" : "Retirer l’image") + '</button>';
     container.appendChild(item);
   }
   function refreshPreviews(project = state.data.PROJECTS.find(item => item.id === state.currentId)) {
@@ -201,6 +207,7 @@
     if (!project) return;
     addPreview($('[data-preview="cover"]'), project.thumbnail, false, { kind: "cover", caption: project.thumbnailCaption });
     const gallery = project.gallery || [];
+    const videos = project.videos || [];
     const groups = {
       still: gallery.filter(item => /still-/.test(mediaPath(item))),
       technical: gallery.filter(item => /capture-/.test(mediaPath(item))),
@@ -208,12 +215,16 @@
       bts: gallery.filter(item => /bts-/.test(mediaPath(item)))
     };
     Object.keys(groups).forEach(key => groups[key].slice(-4).forEach(item => addPreview($('[data-preview="' + key + '"]'), mediaPath(item), false, { kind: "gallery", index: project.gallery.indexOf(item), caption: item.caption })));
+    const videoGroups = {};
+    ["still", "technical", "workflow", "bts"].forEach(key => {
+      videoGroups[key] = videos.filter(item => item.mediaCategory === key || (!item.mediaCategory && new RegExp((key === "technical" ? "capture" : key) + "-").test(item.src || "")));
+      videoGroups[key].slice(-4).forEach(item => addPreview($('[data-preview="' + key + '"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
+    });
     const comparisons = project.comparisons || [];
     comparisons.forEach((item, index) => { addPreview($('[data-preview="comparison"]'), item.before, false, { kind: "comparison-before", index, caption: item.beforeCaption }); addPreview($('[data-preview="comparison"]'), item.after, false, { kind: "comparison-after", index, caption: item.afterCaption }); });
-    const videos = project.videos || [];
     videos.filter(item => /breakdown-/.test(item.src || "")).slice(-3).forEach(item => addPreview($('[data-preview="breakdown"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
     videos.filter(item => /project\./.test(item.src || "")).slice(-1).forEach(item => addPreview($('[data-preview="film"]'), item.src, true, { kind: "video", index: project.videos.indexOf(item), caption: item.caption }));
-    const counts = { cover: project.thumbnail ? 1 : 0, still: groups.still.length, technical: groups.technical.length, workflow: groups.workflow.length, bts: groups.bts.length, comparison: comparisons.filter(item => item.before && item.after).length, breakdown: videos.filter(item => /breakdown-/.test(item.src || "")).length, film: videos.filter(item => /project\./.test(item.src || "")).length };
+    const counts = { cover: project.thumbnail ? 1 : 0, still: groups.still.length + videoGroups.still.length, technical: groups.technical.length + videoGroups.technical.length, workflow: groups.workflow.length + videoGroups.workflow.length, bts: groups.bts.length + videoGroups.bts.length, comparison: comparisons.filter(item => item.before && item.after).length, breakdown: videos.filter(item => /breakdown-/.test(item.src || "")).length, film: videos.filter(item => /project\./.test(item.src || "")).length };
     Object.entries(counts).forEach(([key, count]) => { const node = $('[data-media-result="' + key + '"]'); if (node && count) node.textContent = count + (count > 1 ? " fichier(s) ajouté(s)" : " fichier ajouté"); });
   }
   function setSiteForm() {
@@ -231,6 +242,25 @@
     set("experienceDescriptionFR", textFor(experience.description, "fr")); set("experienceDescriptionEN", textFor(experience.description, "en"));
     set("experienceSkillsFR", (experience.skillsDeveloped?.fr || []).join("\n")); set("experienceSkillsEN", (experience.skillsDeveloped?.en || []).join("\n"));
     siteForm.elements.namedItem("backgroundEffects").checked = site.backgroundEffects !== false;
+  }
+  function setCVForm() {
+    if (!cvForm || !state.data) return;
+    const site = state.data.SITE;
+    const set = (name, value) => { const field = cvForm.elements.namedItem(name); if (field) field.value = value ?? ""; };
+    const education = site.education?.[0] || {};
+    const experience = site.experience?.[0] || {};
+    set("cvName", site.name);
+    set("cvPhone", site.phone);
+    set("cvEducationSchool", education.school);
+    set("cvHeadlineFR", textFor(site.headline, "fr")); set("cvHeadlineEN", textFor(site.headline, "en"));
+    set("cvIntroFR", textFor(site.cvIntro, "fr")); set("cvIntroEN", textFor(site.cvIntro, "en"));
+    set("cvDegreeFR", textFor(education.degree, "fr")); set("cvDegreeEN", textFor(education.degree, "en"));
+    set("cvGraduationFR", textFor(education.graduation, "fr")); set("cvGraduationEN", textFor(education.graduation, "en"));
+    set("cvExperienceRoleFR", textFor(experience.role, "fr")); set("cvExperienceRoleEN", textFor(experience.role, "en"));
+    set("cvExperiencePeriodFR", textFor(experience.period, "fr")); set("cvExperiencePeriodEN", textFor(experience.period, "en"));
+    set("cvExperienceDescriptionFR", textFor(experience.description, "fr")); set("cvExperienceDescriptionEN", textFor(experience.description, "en"));
+    set("cvExperienceSkillsFR", (experience.skillsDeveloped?.fr || []).join("\n")); set("cvExperienceSkillsEN", (experience.skillsDeveloped?.en || []).join("\n"));
+    set("cvSectionSpacing", site.cvSettings?.sectionSpacing ?? 2.5); set("cvProjectSpacing", site.cvSettings?.projectSpacing ?? 1.5);
   }
   function setHomeForm() {
     if (!homeForm || !state.data) return;
@@ -259,6 +289,24 @@
     try { await request("/api/save", state.data); flash("Page d’accueil enregistrée."); }
     catch (error) { flash(error.message, true); }
   });
+  if (cvForm) cvForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const site = state.data.SITE;
+    const value = name => cvForm.elements.namedItem(name).value.trim();
+    const education = site.education?.[0] || {};
+    const experience = site.experience?.[0] || {};
+    site.name = value("cvName");
+    site.phone = value("cvPhone");
+    site.headline = { fr: value("cvHeadlineFR"), en: value("cvHeadlineEN") };
+    site.cvIntro = { fr: value("cvIntroFR"), en: value("cvIntroEN") };
+    if (!site.education) site.education = [];
+    site.education[0] = { ...education, school: value("cvEducationSchool"), degree: { fr: value("cvDegreeFR"), en: value("cvDegreeEN") }, graduation: { fr: value("cvGraduationFR"), en: value("cvGraduationEN") } };
+    if (!site.experience) site.experience = [];
+    site.experience[0] = { ...experience, employer: experience.employer || "Super U", role: { fr: value("cvExperienceRoleFR"), en: value("cvExperienceRoleEN") }, period: { fr: value("cvExperiencePeriodFR"), en: value("cvExperiencePeriodEN") }, description: { fr: value("cvExperienceDescriptionFR"), en: value("cvExperienceDescriptionEN") }, skillsDeveloped: { fr: lines(value("cvExperienceSkillsFR")), en: lines(value("cvExperienceSkillsEN")) } };
+    site.cvSettings = { sectionSpacing: Math.max(1, Math.min(8, Number(value("cvSectionSpacing")) || 2.5)), projectSpacing: Math.max(0, Math.min(5, Number(value("cvProjectSpacing")) || 1.5)) };
+    try { await request("/api/save", state.data); setCVForm(); flash("CV enregistré. Les PDF seront générés localement."); }
+    catch (error) { flash(error.message, true); }
+  });
   if (homeForm) homeForm.addEventListener("change", async event => {
     const input = event.target;
     if (input.name !== "homeHeroImage" || !input.files?.length) return;
@@ -269,8 +317,22 @@
       await request("/api/save", state.data);
       setHomeForm();
       flash("Image principale de l’accueil enregistrée.");
-    } catch (error) { flash(error.message, true); }
+    } catch (error) { setHomeForm(); flash(error.message, true); }
     finally { input.disabled = false; input.value = ""; }
+  });
+  if (homeForm) homeForm.addEventListener("click", async event => {
+    if (!event.target.closest("[data-media-remove]")) return;
+    const row = event.target.closest(".media-preview-item");
+    if (!row) return;
+    const path = row.dataset.mediaPath;
+    const site = state.data.SITE;
+    if (site.heroImage === path) site.heroImage = "";
+    try {
+      await request("/api/save", state.data);
+      await request("/api/remove-media", { path });
+      setHomeForm();
+      flash("Image principale retirée de l’accueil.");
+    } catch (error) { setHomeForm(); flash(error.message, true); }
   });
   function nextPairIndex(project, side) {
     const comparisons = project.comparisons || [];
@@ -290,6 +352,10 @@
       project.comparisons ||= [];
       while (project.comparisons.length <= index) project.comparisons.push({ label: { fr: "Avant / après", en: "Before / after" } });
       project.comparisons[index][type] = result.path;
+    } else if (["still", "technical", "workflow", "bts"].includes(type) && file.type.startsWith("video/")) {
+      project.videos ||= [];
+      const labels = { still: ["Vidéo du projet", "Project video"], technical: ["Capture technique vidéo", "Technical video capture"], workflow: ["Workflow vidéo", "Video workflow"], bts: ["Coulisses vidéo", "Behind-the-scenes video"] };
+      project.videos.push({ type: "file", src: result.path, title: { fr: labels[type][0], en: labels[type][1] }, mediaCategory: type });
     } else if (["still", "technical", "workflow", "bts"].includes(type)) {
       const labels = { still: ["Image du projet", "Project still"], technical: ["Capture technique", "Technical capture"], workflow: ["Workflow", "Workflow"], bts: ["Coulisses", "Behind the scenes"] };
       project.gallery ||= [];
@@ -321,6 +387,31 @@
     if (!row) return;
     const fields = row.querySelector("[data-caption-fields]");
     if (event.target.closest("[data-caption-toggle]")) { fields.hidden = !fields.hidden; return; }
+    if (event.target.closest("[data-media-remove]")) {
+      const project = state.data.PROJECTS.find(item => item.id === state.currentId);
+      if (!project) return;
+      const path = row.dataset.mediaPath;
+      const index = Number(row.dataset.captionIndex);
+      if (row.dataset.captionKind === "cover") {
+        if (project.thumbnail === path) project.thumbnail = "";
+        if (project.hero === path) project.hero = "";
+        delete project.thumbnailCaption;
+      } else if (row.dataset.captionKind === "gallery") project.gallery.splice(index, 1);
+      else if (row.dataset.captionKind === "comparison-before" || row.dataset.captionKind === "comparison-after") {
+        const side = row.dataset.captionKind === "comparison-before" ? "before" : "after";
+        const captionSide = side + "Caption";
+        delete project.comparisons[index][side];
+        delete project.comparisons[index][captionSide];
+        if (!project.comparisons[index].before && !project.comparisons[index].after) project.comparisons.splice(index, 1);
+      } else if (row.dataset.captionKind === "video") project.videos.splice(index, 1);
+      try {
+        await request("/api/save", state.data);
+        await request("/api/remove-media", { path });
+        refreshPreviews(project);
+        flash("Média retiré du projet.");
+      } catch (error) { refreshPreviews(project); flash(error.message, true); }
+      return;
+    }
     if (!event.target.closest("[data-caption-save]")) return;
     const project = state.data.PROJECTS.find(item => item.id === state.currentId);
     if (!project) return;
@@ -382,6 +473,7 @@
       state.data = await request("/api/data");
       state.data.PROJECTS.sort(byOrder);
       setSiteForm();
+      setCVForm();
       setHomeForm();
       setAdminTab("projects");
       renderSoftwarePicker();

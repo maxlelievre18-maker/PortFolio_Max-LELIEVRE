@@ -474,6 +474,8 @@ body {
 .media-caption-fields[hidden] { display:none; }
 .media-caption-fields .field { gap:4px; font-size:9px; }
 .media-caption-fields textarea { min-height:52px; }
+.media-remove { min-height:28px; padding:0 8px; color:#d9a9aa; font-size:9px; }
+.media-remove:hover { border-color:#a45e62; color:#ffd7d7; }
 .admin-content { min-width:0; }
 .admin-layout.is-site-settings { grid-template-columns:minmax(0,1fr); }
 .admin-layout.is-site-settings .library { display:none; }

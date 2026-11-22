@@ -25,6 +25,7 @@
         <button class="admin-tab is-active" type="button" role="tab" aria-controls="project-editor" aria-selected="true" data-admin-tab="projects">Projets et médias</button>
         <button class="admin-tab" type="button" role="tab" aria-controls="home-settings-panel" aria-selected="false" data-admin-tab="home">Page d’accueil</button>
         <button class="admin-tab" type="button" role="tab" aria-controls="site-settings-panel" aria-selected="false" data-admin-tab="site">Page À propos et affichage du site</button>
+        <button class="admin-tab" type="button" role="tab" aria-controls="cv-settings-panel" aria-selected="false" data-admin-tab="cv">Modification du CV</button>
       </nav>
     <section class="editor" id="project-editor" role="tabpanel" aria-labelledby="editor-title">
       <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
@@ -60,13 +61,13 @@
         <section class="media-manager" aria-labelledby="media-title"><div class="section-heading"><div><p class="eyebrow">IMAGES ET VIDÉOS</p><h2 id="media-title">Préparer les médias du projet</h2><p class="muted">Les fichiers sélectionnés sont copiés dans le dossier du projet sous <code>assets/</code>. Enregistre d’abord la fiche avant d’ajouter des médias.</p></div></div>
           <div class="media-grid">
             <article class="media-card media-card--cover"><div class="media-card__top"><span class="media-index">01</span><div><h3>Image principale · cover</h3><p>L’image de couverture du projet. Elle apparaît sur la carte et en tête de la page projet.</p></div><b>ESSENTIELLE</b></div><div class="file-row"><input type="file" data-upload="cover" accept="image/webp,image/jpeg,image/png,image/avif"><span data-media-result="cover">cover.webp · 1920 × 1080 recommandé</span></div><div class="media-preview" data-preview="cover"></div></article>
-            <article class="media-card"><div class="media-card__top"><span class="media-index">02</span><div><h3>Images du projet · stills</h3><p>Images représentatives du film ou du projet fini. Elles montrent le résultat dans son contexte.</p></div><b>RECOMMANDÉ</b></div><div class="file-row"><input type="file" data-upload="still" accept="image/webp,image/jpeg,image/png,image/avif" multiple><span data-media-result="still">still-01.webp · 1920 × 1080</span></div><div class="media-preview" data-preview="still"></div></article>
-            <article class="media-card"><div class="media-card__top"><span class="media-index">03</span><div><h3>Before / After</h3><p>Ajoute une paire d’images du même plan. Pour en créer plusieurs, choisis un fichier « Avant », puis son « Après » ; recommence pour chaque paire.</p></div><b>VFX RECOMMANDÉ</b></div><div class="pair-inputs"><label>Avant · une image par paire<input type="file" data-upload="before" accept="image/webp,image/jpeg,image/png,image/avif"></label><label>Après · une image par paire<input type="file" data-upload="after" accept="image/webp,image/jpeg,image/png,image/avif"></label></div><span data-media-result="comparison">before-after-01-before / -after.webp · recommencer pour chaque paire</span><div class="media-preview" data-preview="comparison"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">02</span><div><h3>Vidéo du film / extrait</h3><p>Extrait représentatif du projet, uniquement si tu as le droit de le publier. Format MP4 1080p conseillé.</p></div><b>SI AUTORISÉ</b></div><div class="file-row"><input type="file" data-upload="film" accept="video/mp4,video/webm,video/quicktime"><span data-media-result="film">project.mp4</span></div><div class="media-preview" data-preview="film"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">03</span><div><h3>Before / After</h3><p>Pour associer plusieurs plans, choisis les fichiers Avant dans l’ordre : Avant 1 correspond à Après 1, Avant 2 à Après 2, etc.</p></div><b>VFX RECOMMANDÉ</b></div><div class="pair-inputs"><label>Avant — sélectionne les plans dans l’ordre<input type="file" data-upload="before" accept="image/webp,image/jpeg,image/png,image/avif" multiple></label><label>Après — même ordre que les fichiers Avant<input type="file" data-upload="after" accept="image/webp,image/jpeg,image/png,image/avif" multiple></label></div><span data-media-result="comparison">Paire 1 : Avant 1 ↔ Après 1 · Paire 2 : Avant 2 ↔ Après 2</span><div class="media-preview" data-preview="comparison"></div></article>
             <article class="media-card"><div class="media-card__top"><span class="media-index">04</span><div><h3>Breakdown vidéo</h3><p>Une courte démonstration du plan : étapes, passes ou évolution avant / après. 1080p, 15–45 secondes.</p></div><b>VFX RECOMMANDÉ</b></div><div class="file-row"><input type="file" data-upload="breakdown" accept="video/mp4,video/webm,video/quicktime" multiple><span data-media-result="breakdown">breakdown-01.mp4</span></div><div class="media-preview" data-preview="breakdown"></div></article>
-            <article class="media-card"><div class="media-card__top"><span class="media-index">05</span><div><h3>Capture technique</h3><p>Capture de Nuke, Blender ou d’un autre logiciel, lisible et en haute résolution. Masque les informations personnelles.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="technical" accept="image/webp,image/jpeg,image/png,image/avif" multiple><span data-media-result="technical">capture-01.webp · haute résolution</span></div><div class="media-preview" data-preview="technical"></div></article>
-            <article class="media-card"><div class="media-card__top"><span class="media-index">06</span><div><h3>Workflow</h3><p>Capture d’un node graph, de passes ou des étapes de fabrication pour expliquer la méthode. Plusieurs fichiers peuvent être choisis ensemble.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="workflow" accept="image/webp,image/jpeg,image/png,image/avif" multiple><span data-media-result="workflow">workflow-01.webp · haute résolution</span></div><div class="media-preview" data-preview="workflow"></div></article>
-            <article class="media-card"><div class="media-card__top"><span class="media-index">07</span><div><h3>Making-of · BTS</h3><p>Photo de tournage, du plateau ou des coulisses. Choisis une image qui apporte du contexte au projet.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="bts" accept="image/webp,image/jpeg,image/png,image/avif" multiple><span data-media-result="bts">bts-01.webp · photo haute résolution</span></div><div class="media-preview" data-preview="bts"></div></article>
-            <article class="media-card"><div class="media-card__top"><span class="media-index">08</span><div><h3>Vidéo du film / extrait</h3><p>Extrait représentatif du projet, uniquement si tu as le droit de le publier. Format MP4 1080p conseillé.</p></div><b>SI AUTORISÉ</b></div><div class="file-row"><input type="file" data-upload="film" accept="video/mp4,video/webm,video/quicktime"><span data-media-result="film">project.mp4</span></div><div class="media-preview" data-preview="film"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">05</span><div><h3>Images du projet · stills</h3><p>Images représentatives du film ou du projet fini. Elles montrent le résultat dans son contexte.</p></div><b>RECOMMANDÉ</b></div><div class="file-row"><input type="file" data-upload="still" accept="image/webp,image/jpeg,image/png,image/avif,video/mp4,video/webm,video/quicktime" multiple><span data-media-result="still">still-01.webp · 1920 × 1080</span></div><div class="media-preview" data-preview="still"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">06</span><div><h3>Capture technique</h3><p>Capture de Nuke, Blender ou d’un autre logiciel, lisible et en haute résolution. Masque les informations personnelles.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="technical" accept="image/webp,image/jpeg,image/png,image/avif,video/mp4,video/webm,video/quicktime" multiple><span data-media-result="technical">capture-01.webp · haute résolution</span></div><div class="media-preview" data-preview="technical"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">07</span><div><h3>Workflow</h3><p>Capture d’un node graph, de passes ou des étapes de fabrication pour expliquer la méthode. Plusieurs fichiers peuvent être choisis ensemble.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="workflow" accept="image/webp,image/jpeg,image/png,image/avif,video/mp4,video/webm,video/quicktime" multiple><span data-media-result="workflow">workflow-01.webp · haute résolution</span></div><div class="media-preview" data-preview="workflow"></div></article>
+            <article class="media-card"><div class="media-card__top"><span class="media-index">08</span><div><h3>Making-of · BTS</h3><p>Photo de tournage, du plateau ou des coulisses. Choisis une image qui apporte du contexte au projet.</p></div><b>OPTIONNEL</b></div><div class="file-row"><input type="file" data-upload="bts" accept="image/webp,image/jpeg,image/png,image/avif,video/mp4,video/webm,video/quicktime" multiple><span data-media-result="bts">bts-01.webp · photo haute résolution</span></div><div class="media-preview" data-preview="bts"></div></article>
           </div>
         </section>
 
@@ -110,6 +111,42 @@
         <fieldset class="experience-editor"><legend>Employeur</legend><label class="field"><span>Nom de l’employeur</span><input name="experienceEmployer"></label></fieldset>
         <label class="site-toggle"><input name="backgroundEffects" type="checkbox"> Afficher les motifs graphiques subtils dans le fond du site</label>
         <div class="save-bar"><span>Les modifications sont enregistrées dans les données du portfolio.</span><button class="button button--blue" type="submit">Enregistrer la page À propos</button></div>
+      </form>
+    </section>
+    <section class="site-settings" id="cv-settings-panel" role="tabpanel" aria-labelledby="cv-settings-title" hidden>
+      <form id="cv-settings-form">
+        <div class="section-heading"><div><p class="eyebrow">CV</p><h2 id="cv-settings-title">Modifier le CV</h2><p class="muted">Les textes sont enregistrés dans les données locales. Les compétences de Super U apparaissent aussi sur le CV.</p></div></div>
+        <div class="language-columns">
+          <section class="language-column"><h3>Français</h3>
+            <label class="field"><span>Nom</span><input name="cvName" required></label>
+            <label class="field"><span>Téléphone affiché sur le CV</span><input name="cvPhone" type="tel"></label>
+            <label class="field"><span>Titre professionnel</span><input name="cvHeadlineFR"></label>
+            <label class="field"><span>Profil</span><textarea name="cvIntroFR" rows="4"></textarea></label>
+            <label class="field"><span>Diplôme</span><input name="cvDegreeFR"></label>
+            <label class="field"><span>École</span><input name="cvEducationSchool"></label>
+            <label class="field"><span>Année / période de formation</span><input name="cvGraduationFR"></label>
+            <label class="field"><span>Poste chez Super U</span><input name="cvExperienceRoleFR"></label>
+            <label class="field"><span>Période chez Super U</span><input name="cvExperiencePeriodFR"></label>
+            <label class="field"><span>Description de l’expérience</span><textarea name="cvExperienceDescriptionFR" rows="3"></textarea></label>
+            <label class="field"><span>Compétences développées · une par ligne</span><textarea name="cvExperienceSkillsFR" rows="5"></textarea></label>
+          </section>
+          <section class="language-column"><h3>English</h3>
+            <p class="muted">The name and school are shared across both CV languages.</p>
+            <label class="field"><span>Professional headline</span><input name="cvHeadlineEN"></label>
+            <label class="field"><span>Profile</span><textarea name="cvIntroEN" rows="4"></textarea></label>
+            <label class="field"><span>Degree</span><input name="cvDegreeEN"></label>
+            <label class="field"><span>Graduation / period</span><input name="cvGraduationEN"></label>
+            <label class="field"><span>Super U role</span><input name="cvExperienceRoleEN"></label>
+            <label class="field"><span>Super U period</span><input name="cvExperiencePeriodEN"></label>
+            <label class="field"><span>Experience description</span><textarea name="cvExperienceDescriptionEN" rows="3"></textarea></label>
+            <label class="field"><span>Skills developed · one per line</span><textarea name="cvExperienceSkillsEN" rows="5"></textarea></label>
+          </section>
+        </div>
+        <div class="form-grid cv-spacing-fields">
+          <label class="field"><span>Espacement entre les sections · mm</span><input name="cvSectionSpacing" type="number" min="1" max="8" step="0.5"></label>
+          <label class="field"><span>Espacement entre les projets · mm</span><input name="cvProjectSpacing" type="number" min="0" max="5" step="0.5"></label>
+        </div>
+        <div class="save-bar"><span>Le CV français, anglais et les PDF seront mis à jour à l’enregistrement.</span><button class="button button--blue" type="submit">Enregistrer le CV</button></div>
       </form>
     </section>
     </div>

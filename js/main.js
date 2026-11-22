@@ -361,7 +361,8 @@
   function contactIcon(kind) {
     if (kind === "linkedin" || kind === "youtube") return '<img class="contact-icon contact-icon--' + kind + '" src="assets/icons/social-' + kind + '.svg" alt="">';
     const paths = {
-      email: '<path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/>'
+      email: '<path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/>',
+      phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.35 1.9.68 2.8a2 2 0 0 1-.45 2.11L8.07 9.93a16 16 0 0 0 6 6l1.3-1.27a2 2 0 0 1 2.11-.45c.9.33 1.84.56 2.8.68A2 2 0 0 1 22 16.92z"/>'
     };
     return '<svg class="contact-icon contact-icon--' + kind + '" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (paths[kind] || paths.email) + '</svg>';
   }
@@ -372,7 +373,7 @@
 
   function contactProfileLink(kind, label, url, text) {
     if (!url) return '';
-    const external = kind !== "email";
+    const external = kind === "linkedin" || kind === "youtube";
     return '<a class="contact-profile" href="' + esc(url) + '"' + (external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' +
       contactIcon(kind) + '<span><small>' + esc(label) + '</small><strong>' + esc(text) + '</strong></span>' +
       (external ? '<span class="contact-profile__arrow" aria-hidden="true">↗</span>' : '') +
@@ -1170,20 +1171,20 @@
         html: '<div class="note-panel"><p class="note-panel__label">' + esc(t("project.technicalNotes")) + '</p><div class="prose prose--small">' + formatText(project.technicalNotes) + '</div></div>'
       });
     }
-    if ((project.gallery || []).some(function (item) { return item && item.src; })) {
-      sections.push({ id: "gallery", label: t("project.gallery"), html: renderGallery(project) });
-    }
     if ((project.videos || []).length) {
       sections.push({ id: "videos", label: t("project.videos"), html: renderVideos(project) });
-    }
-    if ((project.breakdown || []).length) {
-      sections.push({ id: "breakdown", label: t("project.breakdown"), html: renderBreakdown(project) });
     }
     if ((project.comparisons || []).filter(function (item) { return item && item.before && item.after; }).length) {
       sections.push({ id: "comparisons", label: t("project.comparisons"), html: renderComparisons(project) });
     }
+    if ((project.breakdown || []).length) {
+      sections.push({ id: "breakdown", label: t("project.breakdown"), html: renderBreakdown(project) });
+    }
     if ((project.credits || []).length || project.collaborator?.name) {
       sections.push({ id: "credits", label: t("project.credits"), html: renderCredits(project) });
+    }
+    if ((project.gallery || []).some(function (item) { return item && item.src; })) {
+      sections.push({ id: "gallery", label: t("project.gallery"), html: renderGallery(project) });
     }
 
     const note = hasText(project.note)
@@ -1373,7 +1374,9 @@
     const about = SITE.about || {};
     const sections = about.sections || t("about.sections");
     const aboutIntro = pick(about.intro) || pick(SITE.bio);
-    const software = SITE.software || [];
+    const software = Array.from(new Set(PROJECTS.filter(function (project) { return project.visible !== false; })
+      .flatMap(function (project) { return project.software || []; })))
+      .filter(function (name) { return SOFTWARE_CATALOG.some(function (item) { return item.name === name && item.logo; }); });
 
     return '<section class="page-hero" aria-labelledby="about-title">' +
         '<div class="container">' +
@@ -1463,17 +1466,18 @@
       ? { profile: "Profil", skills: "Compétences", software: "Logiciels", education: "Formation", experience: "Expérience professionnelle", projects: "Projets", download: "Télécharger le CV en PDF", back: "Retour au portfolio", year: "Année à préciser", developed: "Compétences développées" }
       : { profile: "Profile", skills: "Skills", software: "Software", education: "Education", experience: "Professional experience", projects: "Projects", download: "Download CV as PDF", back: "Back to portfolio", year: "Year to be confirmed", developed: "Skills developed" };
     const projects = cvProjects();
+    const cvSpacing = SITE.cvSettings || {};
+    const sectionSpacing = Math.max(1, Math.min(8, Number(cvSpacing.sectionSpacing) || 2.5));
+    const projectSpacing = Math.max(0, Math.min(5, Number(cvSpacing.projectSpacing) || 1.5));
+    const portfolioUrl = SITE.portfolioUrl || "https://maxlelievre18-maker.github.io/PortFolio_Max-LELIEVRE/";
+    const phone = String(SITE.phone || "").trim();
+    const phoneDigits = phone.replace(/\D/g, "");
+    const phoneHref = phoneDigits ? "tel:" + (phoneDigits.startsWith("0") ? "+33" + phoneDigits.slice(1) : "+" + phoneDigits) : "";
     const cvContacts = [
       contactProfileLink("email", t("contact.emailLabel"), SITE.email ? "mailto:" + SITE.email : "", SITE.email),
       contactProfileLink("linkedin", t("contact.linkedinLabel"), SITE.linkedin, SITE.name),
-      contactProfileLink("youtube", t("contact.youtubeLabel"), SITE.youtube, SITE.name)
+      contactProfileLink("phone", t("contact.phoneLabel"), phoneHref, phone)
     ].filter(Boolean).join("");
-    const skillsSection = SITE.skills?.length
-      ? '<section class="cv-section"><h2>' + esc(labels.skills) + '</h2><p>' + SITE.skills.map(skill => '<span class="cv-tag">' + esc(pick(skill)) + '</span>').join("") + '</p></section>'
-      : "";
-    const softwareSection = SITE.software?.length
-      ? '<section class="cv-section"><h2>' + esc(labels.software) + '</h2><div class="software-logo-list software-logo-list--cv">' + softwareMarks(SITE.software, "cv") + '</div></section>'
-      : "";
     const educationSection = '<section class="cv-section"><h2>' + esc(labels.education) + '</h2>' + (SITE.education || []).map(item => '<div class="cv-education"><strong>' + esc(item.school) + '</strong><span>' + esc(pick(item.degree)) + '</span><span>' + esc(pick(item.graduation)) + '</span></div>').join("") + '</section>';
     const projectSection = '<section class="cv-section"><h2>' + esc(labels.projects) + '</h2><div class="cv-projects">' + projects.map(project => {
       const contribution = (project.contributions || []).map(pick).filter(Boolean).join(" · ");
@@ -1491,14 +1495,13 @@
     }).join("") + '</div></section>';
     const experienceSection = (SITE.experience || []).filter(item => item && item.employer).map(item => {
       const skills = (item.skillsDeveloped?.[lang] || []).filter(Boolean);
-      return '<article class="cv-experience"><div><h3>' + esc(item.employer) + '</h3><p>' + esc(pick(item.role)) + '</p></div><div><strong>' + esc(pick(item.period)) + '</strong><p>' + esc(pick(item.description)) + '</p>' + (skills.length ? '<p class="cv-experience__skills-title">' + esc(labels.developed) + '</p><ul class="cv-experience__skills">' + skills.map(skill => '<li>' + esc(skill) + '</li>').join("") + '</ul>' : "") + '</div></article>';
+      return '<article class="cv-experience"><div><h3>' + esc(item.employer) + '</h3><p>' + esc(pick(item.role)) + '</p><strong>' + esc(pick(item.period)) + '</strong>' + (skills.length ? '<p class="cv-experience__skills"><strong>' + esc(labels.developed) + '</strong><br>' + skills.map(esc).join(' / ') + '</p>' : '') + '</div><p>' + esc(pick(item.description)) + '</p></article>';
     }).join("");
-    const pdfSrc = "output/pdf/cv-max-lelievre-" + lang + ".pdf#toolbar=0&navpanes=0";
-    const pdfPreview = '<details class="cv-pdf-preview"><summary>' + (lang === "fr" ? "Aperçu du PDF généré" : "Preview generated PDF") + '</summary><iframe src="' + pdfSrc + '" title="' + (lang === "fr" ? "Aperçu du CV en PDF" : "PDF CV preview") + '"></iframe></details>';
     return '<div class="cv-toolbar"><a class="btn btn--ghost" href="#/">← ' + esc(labels.back) + '</a>' + langSwitcher("lang-switch--cv") + '<a class="btn btn--primary" href="output/pdf/cv-max-lelievre-' + lang + '.pdf" download="Max-Lelievre-CV-' + lang.toUpperCase() + '.pdf">' + esc(labels.download) + ' ↓</a></div>' +
-      '<article class="cv-sheet" aria-label="CV ' + esc(SITE.name) + '"><header class="cv-header' + (SITE.portrait ? ' cv-header--with-portrait' : '') + '">' + (SITE.portrait ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait) + '" alt="" onerror="this.hidden=true">' : '') + '<div class="cv-header__main"><p class="cv-kicker">CV · ' + esc(labels.profile) + '</p><h1>' + esc(SITE.name.toLocaleUpperCase("fr")) + '</h1><p class="cv-headline">' + esc(pick(SITE.headline)) + '</p><div class="cv-contact-box" aria-label="' + esc(t("contact.title")) + '">' + cvContacts + '</div></div></header>' +
-      '<section class="cv-section"><h2>' + esc(labels.profile) + '</h2><p>' + esc(pick(SITE.cvIntro)) + '</p></section>' + skillsSection + softwareSection + educationSection + projectSection +
-      (experienceSection ? '<section class="cv-section"><h2>' + esc(labels.experience) + '</h2><div class="cv-experiences">' + experienceSection + '</div></section>' : "") + '</article>' + pdfPreview;
+      '<article class="cv-sheet" style="--cv-section-gap:' + sectionSpacing + 'mm;--cv-project-gap:' + projectSpacing + 'mm" aria-label="CV ' + esc(SITE.name) + '"><header class="cv-header' + ((SITE.portrait || SITE.heroImage) ? ' cv-header--with-portrait' : '') + '"><div class="cv-header__main"><div class="cv-contact-box" aria-label="' + esc(t("contact.title")) + '">' + cvContacts + '</div><h1>' + esc(SITE.name.toLocaleUpperCase("fr")) + '</h1><p class="cv-headline">' + esc(pick(SITE.headline)) + '</p></div>' + ((SITE.portrait || SITE.heroImage) ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait || SITE.heroImage) + '" alt="Portrait de ' + esc(SITE.name) + '" onerror="this.hidden=true">' : '') + '</header>' +
+      '<section class="cv-section"><h2>' + esc(labels.profile) + '</h2><p>' + esc(pick(SITE.cvIntro)) + '</p></section>' + educationSection + projectSection +
+      (experienceSection ? '<section class="cv-section"><h2>' + esc(labels.experience) + '</h2><div class="cv-experiences">' + experienceSection + '</div></section>' : "") +
+      '<footer class="cv-footer"><span>Lien de mon portfolio :</span> <a href="' + esc(portfolioUrl) + '" target="_blank" rel="noopener noreferrer">' + esc(portfolioUrl) + '</a></footer></article>';
   }
 
   /* ----------------------------------------------------------

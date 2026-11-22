@@ -1,4 +1,4 @@
-/* Fichier généré depuis data/portfolio.json avec project_manager.mjs. */
+/* Fichier g?n?r? depuis data/portfolio.json avec project_manager.mjs. */
 window.SITE = {
   "name": "Max Lelièvre",
   "location": "Nantes / Paris - FRANCE",
@@ -13,8 +13,8 @@ window.SITE = {
     "en": "I am an audiovisual student at CinéCréatis Nantes, graduating in summer 2027. I am particularly interested in postproduction, compositing and visual effects. I enjoy understanding how images are built, exploring technical tools and bringing shots to life while maintaining visual consistency.\n\nPassionate about cinema and science fiction, particularly the Star Wars universe, I am drawn to images that push the boundaries of reality. This passion fuels my curiosity for the techniques, environments and visual effects involved in creating cinematic worlds."
   },
   "cvIntro": {
-    "fr": "Étudiant en audiovisuel à CinéCréatis Nantes, diplômé à l’été 2027. Je m’intéresse à la postproduction, au compositing et aux effets visuels, avec une attention particulière à la cohérence des images.",
-    "en": "Audiovisual student at CinéCréatis Nantes, graduating in summer 2027. I am interested in postproduction, compositing and visual effects, with particular care for visual consistency."
+    "fr": "Étudiant en audiovisuel à CinéCréatis Nantes, spécialisé dans la postproduction et intéressé par le compositing et les effets visuels. Sensible à la précision technique et à la cohérence visuelle, je souhaite approfondir mes compétences en intégration d'images et en création d'environnements visuels.",
+    "en": "I am an audiovisual student at CinéCréatis Nantes, specializing in post-production and interested in compositing and visual effects. With a keen eye for technical precision and visual consistency, I am eager to further develop my skills in image integration and the creation of visual environments."
   },
   "education": [
     {
@@ -32,12 +32,12 @@ window.SITE = {
   "software": [],
   "skills": [],
   "email": "maxlelievre18@gmail.com",
-  "phone": "",
+  "phone": "06 . 49 . 00 . 21 . 90",
   "linkedin": "https://www.linkedin.com/in/max-lelievre/",
   "vimeo": "",
   "youtube": "https://youtube.com/@maxlelievre-gi1on?si=Tvg5pA5bmWALsOWW",
   "cv": "",
-  "heroImage": "",
+  "heroImage": "assets/images/home/hero.jpg",
   "heroImageAlt": {
     "fr": "",
     "en": ""
@@ -123,24 +123,18 @@ window.SITE = {
       },
       "skillsDeveloped": {
         "fr": [
-          "Sens du service client",
-          "Communication",
+          "Organisation et rigueur",
           "Travail en équipe",
-          "Capacité d’adaptation",
-          "Rigueur",
-          "Organisation",
-          "Attention aux détails",
-          "Respect des délais et de la qualité attendue"
+          "Autonomie",
+          "Sens des responsabilités",
+          "Réactivité"
         ],
         "en": [
-          "Customer service",
-          "Communication",
+          "Organization and attention to detail",
           "Teamwork",
-          "Adaptability",
-          "Accuracy",
-          "Organisation",
-          "Attention to detail",
-          "Meeting deadlines and quality standards"
+          "Independence",
+          "Sense of responsibility",
+          "Responsiveness"
         ]
       }
     }
@@ -154,6 +148,10 @@ window.SITE = {
       "fr": "Postproduction, compositing et effets visuels — au service du plan et du récit.",
       "en": "Postproduction, compositing and visual effects — in service of the shot and the story."
     }
+  },
+  "cvSettings": {
+    "sectionSpacing": 2,
+    "projectSpacing": 2
   }
 };
 window.PROJECTS = [
@@ -200,10 +198,6 @@ window.PROJECTS = [
         "en": "Creation and design of the title cards"
       }
     ],
-    "note": {
-      "fr": "Les images des cartons-titres, le générique animé et les crédits de production seront ajoutés prochainement.",
-      "en": "Title card stills, the animated title sequence and production credits will be added soon."
-    },
     "credits": [],
     "software": [
       "After Effects",
@@ -247,17 +241,6 @@ window.PROJECTS = [
         }
       },
       {
-        "src": "assets/images/projects/almd/still-01.png",
-        "alt": {
-          "fr": "Image du projet — ALMD — The Last of Us",
-          "en": "Project still — ALMD — The Last of Us"
-        },
-        "caption": {
-          "fr": "Image du projet",
-          "en": "Project still"
-        }
-      },
-      {
         "src": "assets/images/projects/almd/capture-01.png",
         "alt": {
           "fr": "Capture technique — ALMD — The Last of Us",
@@ -266,6 +249,17 @@ window.PROJECTS = [
         "caption": {
           "fr": "Les cartons titres on été réaliser sur AfterEffect.",
           "en": "The title cards were created in After Effects."
+        }
+      },
+      {
+        "src": "assets/images/projects/almd/bts-02.jpg",
+        "alt": {
+          "fr": "Coulisses — ALMD — The Last of Us",
+          "en": "Behind the scenes — ALMD — The Last of Us"
+        },
+        "caption": {
+          "fr": "Coulisses",
+          "en": "Behind the scenes"
         }
       }
     ],
@@ -276,10 +270,6 @@ window.PROJECTS = [
         "title": {
           "fr": "Extrait du projet",
           "en": "Project excerpt"
-        },
-        "caption": {
-          "fr": "Rien à dire",
-          "en": "Nothing to say"
         }
       }
     ],
@@ -299,6 +289,22 @@ window.PROJECTS = [
         "afterCaption": {
           "fr": "Image issue de la recréation.",
           "en": "Image from the recreation."
+        }
+      },
+      {
+        "label": {
+          "fr": "Avant / après",
+          "en": "Before / after"
+        },
+        "before": "assets/images/projects/almd/before-after-02-before.png",
+        "after": "assets/images/projects/almd/before-after-02-after.png",
+        "afterCaption": {
+          "fr": "Image issue de la recréation.",
+          "en": "Image from the recreation."
+        },
+        "beforeCaption": {
+          "fr": "Image issue de la série original - \" The Last of Us\"",
+          "en": "Image from the original series—“The Last of Us”"
         }
       }
     ],
@@ -339,12 +345,12 @@ window.PROJECTS = [
       "en": "Postproduction direction\nVFX work\nCleaning"
     },
     "shortDescription": {
-      "fr": "Projet en développement avec l'ESMA, sur lequel j'interviens en direction de la postproduction et sur des travaux de VFX, notamment de cleaning.",
-      "en": "Project in development with ESMA, where I work in postproduction direction and VFX, including cleaning work."
+      "fr": "\"One Last Time\" est un projet collaboratif avec des étudiants de l'ESMA visant à intégrer un objet 3D animé dans des prises de vues réelles. Le travail porte sur le tracking caméra, le compositing, les retouches (cleaning) et l'intégration visuelle de l'élément 3D afin d'assurer un rendu cohérent et réaliste.",
+      "en": "“One Last Time” is a collaborative project with ESMA students aimed at integrating an animated 3D object into live-action footage. The project focuses on camera tracking, compositing, retouching (cleaning), and the visual integration of the 3D element to ensure a consistent and realistic final result."
     },
     "description": {
-      "fr": "Projet en développement avec l'ESMA, sur lequel j'interviens en direction de la postproduction et sur des travaux de VFX, notamment de cleaning.",
-      "en": "Project in development with ESMA, where I work in postproduction direction and VFX, including cleaning work."
+      "fr": "\"One Last Time\" est un projet collaboratif avec des étudiants de l'ESMA visant à intégrer un objet 3D animé dans des prises de vues réelles. Le travail porte sur le tracking caméra, le compositing, les retouches (cleaning) et l'intégration visuelle de l'élément 3D afin d'assurer un rendu cohérent et réaliste.",
+      "en": "“One Last Time” is a collaborative project with ESMA students aimed at integrating an animated 3D object into live-action footage. The project focuses on camera tracking, compositing, retouching (cleaning), and the visual integration of the 3D element to ensure a consistent and realistic final result."
     },
     "contributions": [
       {
@@ -360,25 +366,22 @@ window.PROJECTS = [
         "en": "Cleaning"
       }
     ],
-    "note": {
-      "fr": "Le détail des plans et des interventions VFX sera précisé au fur et à mesure de l'avancement du projet.",
-      "en": "The shot breakdown and VFX work will be detailed as the project progresses."
-    },
     "credits": [],
     "software": [
       "Nuke",
+      "After Effects",
       "Premiere Pro",
       "Maya"
     ],
-    "thumbnail": "",
+    "thumbnail": "assets/images/projects/olt/cover.jpg",
     "thumbnailAlt": {
-      "fr": "",
-      "en": ""
+      "fr": "Image principale — One Last Time  — ESMA",
+      "en": "Project cover — One Last Time  — ESMA"
     },
-    "hero": "",
+    "hero": "assets/images/projects/olt/cover.jpg",
     "heroAlt": {
-      "fr": "",
-      "en": ""
+      "fr": "Image principale — One Last Time  — ESMA",
+      "en": "Project cover — One Last Time  — ESMA"
     },
     "gallery": [],
     "videos": [],
@@ -389,7 +392,8 @@ window.PROJECTS = [
       "en": ""
     },
     "order": 2,
-    "titleEN": ""
+    "titleEN": "",
+    "collaborator": null
   },
   {
     "id": "eurydice",
@@ -420,12 +424,12 @@ window.PROJECTS = [
       "en": ""
     },
     "shortDescription": {
-      "fr": "Projet de court métrage de science-fiction dans lequel je suis chargé des VFX.",
-      "en": "Science-fiction short film on which I work as a VFX artist."
+      "fr": "EURYDICE est un projet de court-métrage mêlant science-fiction et drame émotionnel, explorant le lien entre mémoire, perte et espoir à travers une narration alternant passé et présent. Le projet mobilise les VFX pour donner vie à un univers spatial immersif, en mêlant environnements 3D, compositing et intégration d'éléments visuels au service de l'histoire.",
+      "en": "EURYDICE is a short film project that blends science fiction and emotional drama, exploring the connection between memory, loss, and hope through a narrative that alternates between the past and the present. The project uses VFX to bring an immersive space setting to life, combining 3D environments, compositing, and the integration of visual elements to serve the story."
     },
     "description": {
-      "fr": "Projet de court métrage de science-fiction dans lequel je suis chargé des VFX.",
-      "en": "Science-fiction short film on which I work as a VFX artist."
+      "fr": "EURYDICE est un projet de court-métrage mêlant science-fiction et drame émotionnel, explorant le lien entre mémoire, perte et espoir à travers une narration alternant passé et présent. Le projet mobilise les VFX pour donner vie à un univers spatial immersif, en mêlant environnements 3D, compositing et intégration d'éléments visuels au service de l'histoire.",
+      "en": "EURYDICE is a short film project that blends science fiction and emotional drama, exploring the connection between memory, loss, and hope through a narrative that alternates between the past and the present. The project uses VFX to bring an immersive space setting to life, combining 3D environments, compositing, and the integration of visual elements to serve the story."
     },
     "contributions": [],
     "note": {
@@ -440,15 +444,15 @@ window.PROJECTS = [
       "Premiere Pro",
       "Blender"
     ],
-    "thumbnail": "",
+    "thumbnail": "assets/images/projects/eurydice/cover.jpg",
     "thumbnailAlt": {
-      "fr": "",
-      "en": ""
+      "fr": "Image principale — EURYDICE",
+      "en": "Project cover — EURYDICE"
     },
-    "hero": "",
+    "hero": "assets/images/projects/eurydice/cover.jpg",
     "heroAlt": {
-      "fr": "",
-      "en": ""
+      "fr": "Image principale — EURYDICE",
+      "en": "Project cover — EURYDICE"
     },
     "gallery": [],
     "videos": [],
@@ -459,7 +463,8 @@ window.PROJECTS = [
       "en": ""
     },
     "order": 3,
-    "titleEN": ""
+    "titleEN": "",
+    "collaborator": null
   },
   {
     "id": "ffde",

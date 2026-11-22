@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const HOST = "127.0.0.1";
 const PORT = 8765;
-const MAX_FILE = 120 * 1024 * 1024;
+const MAX_FILE = 1024 * 1024 * 1024;
 const DATA_FILE = path.join(ROOT, "data", "portfolio.json");
 const JS_FILE = path.join(ROOT, "js", "projects.js");
 const PDF_DIR = path.join(ROOT, "output", "pdf");
@@ -19,6 +19,10 @@ const MEDIA = {
   before: ["images", "before-after", "before"], after: ["images", "before-after", "after"],
   breakdown: ["videos", "breakdown"], technical: ["images", "capture"],
   workflow: ["images", "workflow"], bts: ["images", "bts"], film: ["videos", "project"]
+};
+const VIDEO_MEDIA = {
+  still: ["videos", "still"], technical: ["videos", "capture"],
+  workflow: ["videos", "workflow"], bts: ["videos", "bts"]
 };
 const MIME = {
   ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
@@ -54,7 +58,7 @@ async function body(req) {
   let size = 0;
   for await (const chunk of req) {
     size += chunk.length;
-    if (size > Math.ceil(MAX_FILE * 1.4) + 1024 * 1024) throw new Error("Le fichier dépasse la limite locale de 120 Mo.");
+    if (size > Math.ceil(MAX_FILE * 1.4) + 1024 * 1024) throw new Error("La requête dépasse la limite locale de 1 Go.");
     chunks.push(chunk);
   }
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
@@ -63,14 +67,15 @@ async function upload(payload) {
   const projectId = String(payload.projectId || "");
   if (!/^[a-z0-9-]+$/.test(projectId)) throw new Error("Enregistre d’abord le projet pour créer son identifiant.");
   const type = String(payload.mediaType || "");
-  const spec = MEDIA[type];
-  if (!spec) throw new Error("Type de média non pris en charge.");
   const ext = path.extname(path.basename(String(payload.filename || ""))).toLowerCase();
-  const video = ["breakdown", "film"].includes(type);
+  const isVideo = [".mp4", ".webm", ".mov"].includes(ext);
+  const spec = isVideo ? (VIDEO_MEDIA[type] || MEDIA[type]) : MEDIA[type];
+  if (!spec || (isVideo && ["cover", "before", "after"].includes(type)) || (!isVideo && ["breakdown", "film"].includes(type))) throw new Error("Type de média ou format de fichier non pris en charge.");
+  const video = isVideo;
   const allowed = video ? [".mp4", ".webm", ".mov"] : [".webp", ".jpg", ".jpeg", ".png", ".avif"];
   if (!allowed.includes(ext)) throw new Error("Format de fichier non pris en charge.");
   const bytes = Buffer.from(String(payload.data || ""), "base64");
-  if (!bytes.length || bytes.length > MAX_FILE) throw new Error("Fichier vide ou supérieur à 120 Mo.");
+  if (!bytes.length || bytes.length > MAX_FILE) throw new Error("Fichier vide ou supérieur à 1 Go.");
   const data = await readData();
   if (!data.PROJECTS.some(project => project.id === projectId)) throw new Error("Projet introuvable : enregistre-le d’abord.");
   const folder = path.join(ROOT, "assets", spec[0], "projects", projectId);
@@ -95,12 +100,36 @@ async function uploadHomeImage(payload) {
   const ext = path.extname(path.basename(String(payload.filename || ""))).toLowerCase();
   if (![".webp", ".jpg", ".jpeg", ".png", ".avif"].includes(ext)) throw new Error("Choisis une image WebP, JPEG, PNG ou AVIF.");
   const bytes = Buffer.from(String(payload.data || ""), "base64");
-  if (!bytes.length || bytes.length > MAX_FILE) throw new Error("Fichier vide ou supérieur à 120 Mo.");
+  if (!bytes.length || bytes.length > MAX_FILE) throw new Error("Fichier vide ou supérieur à 1 Go.");
   const folder = path.join(ROOT, "assets", "images", "home");
   await mkdir(folder, { recursive: true });
   const full = path.join(folder, `hero${ext}`);
   await writeFile(full, bytes);
   return { ok: true, path: path.relative(ROOT, full).replaceAll("\\", "/"), size: bytes.length };
+}
+async function removeMedia(payload) {
+  const relative = String(payload.path || "").replaceAll("\\", "/");
+  const normalized = path.posix.normalize(relative);
+  if (!relative || relative.startsWith("/") || normalized !== relative) throw new Error("Chemin de média invalide.");
+  const full = path.resolve(ROOT, relative);
+  const allowedRoots = [
+    path.join(ROOT, "assets", "images", "projects") + path.sep,
+    path.join(ROOT, "assets", "videos", "projects") + path.sep,
+    path.join(ROOT, "assets", "images", "home") + path.sep
+  ];
+  if (!allowedRoots.some(root => full.startsWith(root))) throw new Error("Ce fichier ne peut pas être retiré depuis le gestionnaire.");
+  const data = await readData();
+  const isReferenced = value => {
+    if (value === relative) return true;
+    if (Array.isArray(value)) return value.some(isReferenced);
+    if (value && typeof value === "object") return Object.values(value).some(isReferenced);
+    return false;
+  };
+  if (isReferenced(data)) throw new Error("Ce média est encore utilisé dans une autre partie du portfolio.");
+  const info = await stat(full);
+  if (!info.isFile()) throw new Error("Fichier média introuvable.");
+  await rm(full);
+  return { ok: true, path: relative };
 }
 async function findEdge() {
   const candidates = [
@@ -174,6 +203,7 @@ async function serve(req, res) {
       const payload = await body(req);
       if (url.pathname === "/api/save") { await writeData(payload); queuePdfGeneration(); json(res, 200, { ok: true }); return; }
       if (url.pathname === "/api/upload-home-image") { json(res, 200, await uploadHomeImage(payload)); return; }
+      if (url.pathname === "/api/remove-media") { json(res, 200, await removeMedia(payload)); return; }
       if (url.pathname === "/api/upload") { json(res, 200, await upload(payload)); return; }
       json(res, 404, { error: "Route inconnue." }); return;
     }
