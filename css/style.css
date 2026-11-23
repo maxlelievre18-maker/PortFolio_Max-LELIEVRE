@@ -1831,6 +1831,7 @@ video.video-frame__el {
   text-transform: uppercase;
 }
 .video-block__caption span { display:block; }
+.video-youtube-link { display:inline-flex; margin-top:.65rem; color:var(--blue-light); font-size:.75rem; text-decoration:underline; text-underline-offset:3px; }
 .video-block__comment { margin-top:6px; color:var(--pale); font-size:12px; letter-spacing:normal; line-height:1.5; text-transform:none; }
 
 .breakdown-list {
@@ -3171,5 +3172,9 @@ a.footer__link:hover {
 }
 
 @media (max-width: 700px) {
-  .cv-sheet { width: calc(100vw - 24px); height: auto; min-height: 0; aspect-ratio: 210 / 297; }
+  .cv-sheet { width: calc(100vw - 24px); height: auto; min-height: 0; aspect-ratio: auto; padding: 18px; }
+  .cv-header__main { min-width: 0; }
+  .cv-header--with-portrait { grid-template-columns: minmax(0,1fr) 72px; }
+  .cv-footer { margin-top: 1.25rem; padding-top: .75rem; }
+  .cv-footer a { overflow-wrap: anywhere; }
 }

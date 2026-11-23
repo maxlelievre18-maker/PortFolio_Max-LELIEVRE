@@ -104,6 +104,19 @@
       .replace(/[&<>"']/g, function (char) { return ESCAPES[char]; });
   }
 
+  function assetUrl(path) {
+    const relativePath = String(path || "").replace(/^\/+/, "");
+    return relativePath ? new URL(relativePath, document.baseURI).href : "";
+  }
+
+  function youtubeEmbedUrl(videoId) {
+    const url = new URL("https://www.youtube-nocookie.com/embed/" + videoId);
+    if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+      url.searchParams.set("origin", window.location.origin);
+    }
+    return url.href;
+  }
+
   function hasText(value) {
     if (value === null || value === undefined) return false;
     if (Array.isArray(value)) return value.length > 0;
@@ -141,7 +154,7 @@
       const name = typeof item === "string" ? item : (item.name || "");
       if (!name) return "";
       const catalogItem = SOFTWARE_CATALOG.find(function (entry) { return entry.name === name; });
-      const icon = catalogItem ? '<img class="software-mark__icon" src="' + esc(catalogItem.logo) + '" alt="" loading="lazy">' : "";
+      const icon = catalogItem ? '<img class="software-mark__icon" src="' + esc(assetUrl(catalogItem.logo)) + '" alt="" loading="lazy">' : "";
       const level = typeof item === "object" && item.level ? '<small>' + esc(item.level) + '</small>' : "";
       return '<span class="software-mark' + (modifier ? " software-mark--" + modifier : "") + '">' + icon + '<span>' + esc(name) + '</span>' + level + '</span>';
     }).join("");
@@ -996,7 +1009,7 @@
   function videoMarkup(item, index) {
     const title = pick(item.title) || (t("project.videos") + " " + padNumber(index + 1));
     if (item.type === "youtube" && /^[A-Za-z0-9_-]{11}$/.test(item.videoId || "")) {
-      return '<iframe class="video-frame__el" src="https://www.youtube-nocookie.com/embed/' + esc(item.videoId) + '" title="' + esc(title) +
+      return '<iframe class="video-frame__el" src="' + esc(youtubeEmbedUrl(item.videoId)) + '" title="' + esc(title) +
         '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
         ' referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>';
     }
@@ -1025,8 +1038,12 @@
     if (!items.length) return "";
     return '<div class="video-list">' + items.map(function (item, index) {
       const title = pick(item.title);
+      const youtubeFallback = item.type === "youtube" && /^[A-Za-z0-9_-]{11}$/.test(item.videoId || "")
+        ? '<a class="video-youtube-link" href="https://www.youtube.com/watch?v=' + esc(item.videoId) + '" target="_blank" rel="noopener">' + (state.lang === "fr" ? "Ouvrir la vidéo sur YouTube ↗" : "Open video on YouTube ↗") + '</a>'
+        : "";
       return '<figure class="video-block">' +
         '<div class="video-frame">' + videoMarkup(item, index) + '</div>' +
+        youtubeFallback +
         (title || pick(item.caption) ? '<figcaption class="video-block__caption">' + (title ? '<span>' + esc(title) + '</span>' : '') + (pick(item.caption) ? '<span class="video-block__comment">' + esc(pick(item.caption)) + '</span>' : '') + '</figcaption>' : "") +
       '</figure>';
     }).join("") + '</div>';
@@ -1148,7 +1165,7 @@
       role ? metaItem(t("project.role"), role) : "",
       categories.length ? metaItem(t("project.categories"), categories.join(" · ")) : "",
       type ? metaItem(t("project.type"), type) : "",
-      software.length ? '<div class="project-meta__item"><dt class="project-meta__label">' + esc(t("project.software")) + '</dt><dd class="project-meta__value project-meta__software">' + software.map(function (name) { var item = SOFTWARE_CATALOG.find(function (entry) { return entry.name === name; }); return item ? '<span class="project-meta__software-item"><img src="/' + esc(item.logo) + '" alt="" loading="lazy"><span>' + esc(name) + '</span></span>' : ''; }).join("") + '</dd></div>' : ""
+      software.length ? '<div class="project-meta__item"><dt class="project-meta__label">' + esc(t("project.software")) + '</dt><dd class="project-meta__value project-meta__software">' + software.map(function (name) { var item = SOFTWARE_CATALOG.find(function (entry) { return entry.name === name; }); return item ? '<span class="project-meta__software-item"><img src="' + esc(assetUrl(item.logo)) + '" alt="" loading="lazy"><span>' + esc(name) + '</span></span>' : ''; }).join("") + '</dd></div>' : ""
     ].filter(Boolean).join("");
 
     const sections = [];
@@ -1285,12 +1302,14 @@
   function renderShowreelPlayer() {
     const showreel = SITE.showreel;
     if (showreel.embed) {
+      const youtubeId = String(showreel.embed).match(/(?:embed\/|[?&]v=)([A-Za-z0-9_-]{11})/)?.[1] || "";
       return '<div class="showreel-player" data-reveal>' +
         '<div class="video-frame video-frame--showreel">' +
-          '<iframe class="video-frame__el" src="' + esc(showreel.embed) + '" title="Showreel — Max Lelièvre"' +
+          '<iframe class="video-frame__el" src="' + esc(youtubeId ? youtubeEmbedUrl(youtubeId) : showreel.embed) + '" title="Showreel — Max Lelièvre"' +
             ' loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
             ' referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
         '</div>' +
+        (youtubeId ? '<a class="video-youtube-link" href="https://www.youtube.com/watch?v=' + esc(youtubeId) + '" target="_blank" rel="noopener">' + (state.lang === "fr" ? "Ouvrir le showreel sur YouTube ↗" : "Open showreel on YouTube ↗") + '</a>' : "") +
       '</div>';
     }
     if (showreel.file) {
@@ -1324,7 +1343,11 @@
   function renderShowreelPage() {
     const related = visibleProjects().slice(0, 3);
     const breakdown = SITE.showreel.breakdown || [];
+    const breakdownId = String(SITE.showreel.breakdownEmbed || "").match(/(?:embed\/|[?&]v=)([A-Za-z0-9_-]{11})/)?.[1] || "";
     const year = SITE.showreel.year;
+    const breakdownVideo = breakdownId
+      ? '<figure class="video-block"><div class="video-frame"><iframe class="video-frame__el" src="' + esc(youtubeEmbedUrl(breakdownId)) + '" title="Breakdown du showreel" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><a class="video-youtube-link" href="https://www.youtube.com/watch?v=' + esc(breakdownId) + '" target="_blank" rel="noopener">' + (state.lang === "fr" ? "Ouvrir le breakdown sur YouTube ↗" : "Open the breakdown on YouTube ↗") + '</a></figure>'
+      : "";
 
     return '<section class="page-hero" aria-labelledby="showreel-title">' +
         '<div class="container">' +
@@ -1350,9 +1373,10 @@
             '</div>' +
             '<p class="section-intro">' + esc(t("showreel.breakdownIntro")) + '</p>' +
           '</div>' +
+          breakdownVideo +
           (breakdown.length
             ? renderBreakdown({ breakdown: breakdown })
-            : emptyState(t("showreel.breakdownTitle"), t("showreel.breakdownEmpty"), t("projectsPage.emptyLabel"))) +
+            : (breakdownVideo ? "" : emptyState(t("showreel.breakdownTitle"), t("showreel.breakdownEmpty"), t("projectsPage.emptyLabel")))) +
         '</div>' +
       '</section>' +
       '<section class="section" aria-labelledby="showreel-projects-title">' +

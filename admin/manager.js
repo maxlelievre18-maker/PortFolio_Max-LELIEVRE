@@ -26,6 +26,10 @@
     if (typeof value === "string") return value;
     return value[lang] || value.fr || value.en || "";
   }
+  function assetUrl(path) {
+    const relativePath = String(path || "").replace(/^\/+/, "");
+    return relativePath ? new URL(relativePath, new URL("../", window.location.href)).href : "";
+  }
   function youtubeVideoId(value) {
     try {
       const url = new URL(String(value || "").trim());
@@ -40,12 +44,17 @@
       return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
     } catch { return ""; }
   }
+  function youtubeEmbedUrl(id) {
+    const url = new URL("https://www.youtube-nocookie.com/embed/" + id);
+    if (window.location.protocol === "http:" || window.location.protocol === "https:") url.searchParams.set("origin", window.location.origin);
+    return url.href;
+  }
   function previewYouTube(container, id) {
     if (!container) return;
     container.replaceChildren();
     if (!id) return;
     const frame = document.createElement("iframe");
-    frame.src = "https://www.youtube-nocookie.com/embed/" + id;
+    frame.src = youtubeEmbedUrl(id);
     frame.title = "Aperçu YouTube";
     frame.loading = "lazy";
     frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
@@ -104,7 +113,7 @@
     const picker = $("#software-picker");
     const catalog = state.data.SOFTWARE_CATALOG || [];
     picker.innerHTML = catalog.length ? catalog.map(item =>
-      '<label class="software-choice"><input type="checkbox" name="software" value="' + esc(item.name) + '"' + (selected.includes(item.name) ? ' checked' : '') + '><img src="/' + esc(item.logo) + '" alt="" loading="lazy"><span>' + esc(item.name) + '</span></label>'
+      '<label class="software-choice"><input type="checkbox" name="software" value="' + esc(item.name) + '"' + (selected.includes(item.name) ? ' checked' : '') + '><img src="' + esc(assetUrl(item.logo)) + '" alt="" loading="lazy"><span>' + esc(item.name) + '</span></label>'
     ).join("") : '<span class="muted">Aucun logo disponible dans le catalogue des logiciels.</span>';
   }
   function val(name, value) {
@@ -230,10 +239,11 @@
     }
     const element = document.createElement(videoId ? "iframe" : video ? "video" : "img");
     if (videoId) {
-      element.src = "https://www.youtube-nocookie.com/embed/" + videoId;
+      element.src = youtubeEmbedUrl(videoId);
       element.title = "Aperçu YouTube";
       element.allowFullscreen = true;
       element.loading = "lazy";
+      element.referrerPolicy = "strict-origin-when-cross-origin";
     } else element.src = "/" + path;
     if (video && !videoId) { element.controls = true; element.muted = true; }
     else if (!video) element.alt = "Aperçu du média";
@@ -302,6 +312,8 @@
     const reel = site.showreel || {};
     const reelUrl = siteForm.elements.namedItem("showreelUrl");
     if (reelUrl) reelUrl.value = reel.embed || "";
+    const breakdownUrl = siteForm.elements.namedItem("breakdownUrl");
+    if (breakdownUrl) breakdownUrl.value = reel.breakdownEmbed || "";
     const reelResult = $("[data-showreel-result]");
     if (reelResult) reelResult.textContent = reel.file ? "Vidéo actuelle : " + reel.file : "Aucun fichier importé.";
   }
@@ -467,7 +479,7 @@
   $("#new-project").addEventListener("click", () => { state.currentId = null; setForm(null); window.scrollTo({ top: 0, behavior: "smooth" }); });
   $("#preview-project").addEventListener("click", () => {
     const id = form.elements.namedItem("id").value;
-    if (id) window.open(new URL("/#/project/" + encodeURIComponent(id), window.location.href).href, "_blank", "noopener,noreferrer");
+    if (id) window.open(new URL("/#/project/" + encodeURIComponent(id), window.location.href).href, "_blank", "noopener");
   });
   if (mediaGrid) mediaGrid.addEventListener("change", event => {
     const select = event.target.closest("[data-video-mode]");
@@ -538,8 +550,12 @@
     site.showreel ||= {};
     const reelUrl = value("showreelUrl");
     const reelId = youtubeVideoId(reelUrl);
+    const breakdownUrl = value("breakdownUrl");
+    const breakdownId = youtubeVideoId(breakdownUrl);
     if (reelUrl && !reelId) { flash("Lien YouTube de showreel invalide.", true); return; }
+    if (breakdownUrl && !breakdownId) { flash("Lien YouTube de breakdown invalide.", true); return; }
     site.showreel.embed = reelId ? "https://www.youtube-nocookie.com/embed/" + reelId : "";
+    site.showreel.breakdownEmbed = breakdownId ? "https://www.youtube-nocookie.com/embed/" + breakdownId : "";
     try { await request("/api/save", state.data); flash("Page À propos, expérience et fond enregistrés. Recharge le site pour afficher les changements."); }
     catch (error) { flash(error.message, true); }
   });

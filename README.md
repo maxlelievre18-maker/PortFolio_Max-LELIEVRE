@@ -14,6 +14,8 @@ Site portfolio statique français / anglais, prêt pour GitHub Pages. Les pages 
 3. Le lanceur ouvre automatiquement l’interface de gestion et le portfolio dans ton navigateur. Sinon, va à [http://127.0.0.1:8765/admin/](http://127.0.0.1:8765/admin/).
 4. Après tes changements, arrête le serveur avec `Ctrl+C`. Le gestionnaire ne fonctionne que sur cet ordinateur ; il ne publie rien sur Internet.
 
+La page publique reste nommée `index.html` pour GitHub Pages. Le gestionnaire se trouve dans `admin/gestion.html` et s’ouvre avec l’adresse `/admin/`. `qa-mobile.html` affiche le site dans un cadre de 390 px pour vérifier sa mise en page mobile ; il utilise le serveur courant et ne dépend pas d’un port différent.
+
 Le site de prévisualisation locale est servi sur [http://127.0.0.1:8765/](http://127.0.0.1:8765/). Depuis la fiche d’un projet, le bouton « Aperçu du site » ouvre directement sa page.
 
 ## Créer ou modifier un projet

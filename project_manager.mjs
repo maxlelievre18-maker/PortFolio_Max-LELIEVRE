@@ -222,7 +222,7 @@ async function serve(req, res) {
     if (req.method !== "GET" && req.method !== "HEAD") { json(res, 405, { error: "Méthode non autorisée." }); return; }
     let pathname = decodeURIComponent(url.pathname);
     if (pathname === "/") pathname = "/index.html";
-    if (pathname === "/admin" || pathname === "/admin/") pathname = "/admin/index.html";
+    if (pathname === "/admin" || pathname === "/admin/") pathname = "/admin/gestion.html";
     const target = path.resolve(ROOT, "." + pathname);
     if (target !== ROOT && !target.startsWith(ROOT + path.sep)) { res.writeHead(403).end("Forbidden"); return; }
     const info = await stat(target);
