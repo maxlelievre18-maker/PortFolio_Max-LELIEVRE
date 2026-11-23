@@ -372,8 +372,7 @@ window.PROJECTS = [
     "software": [
       "Nuke",
       "After Effects",
-      "Premiere Pro",
-      "Maya"
+      "Premiere Pro"
     ],
     "thumbnail": "assets/images/projects/olt/cover.jpg",
     "thumbnailAlt": {
@@ -510,6 +509,188 @@ window.PROJECTS = [
       "fr": "",
       "en": ""
     }
+  },
+  {
+    "id": "pub-casque",
+    "code": "05",
+    "title": "PUB CASQUE",
+    "titleEN": "",
+    "year": "2026",
+    "order": 5,
+    "cvPriority": 10,
+    "type": "exercise",
+    "status": "completed",
+    "categories": [
+      "motion-design",
+      "3d-integration"
+    ],
+    "role": {
+      "fr": "Motion Designer",
+      "en": "Motion Designer"
+    },
+    "roleDescription": {
+      "fr": "",
+      "en": ""
+    },
+    "shortDescription": {
+      "fr": "L'objectif était de concevoir une publicité pour un casque audio en respectant une direction artistique définie. J'ai choisi une esthétique Retro Wave, inspirée des années 80, mêlant néons, contrastes colorés, ambiance futuriste et univers synthwave. L'exercice m'a permis de travailler la mise en scène du produit, l'ambiance visuelle et le rythme.",
+      "en": "The goal was to design an advertisement for a pair of headphones while adhering to a specific artistic direction. I chose a Retro Wave aesthetic, inspired by the 1980s, combining neon lights, bold color contrasts, a futuristic vibe, and a synthwave feel. This exercise allowed me to work on the product’s presentation, the visual atmosphere, and the pacing."
+    },
+    "description": {
+      "fr": "L'objectif était de concevoir une publicité pour un casque audio en respectant une direction artistique définie. J'ai choisi une esthétique Retro Wave, inspirée des années 80, mêlant néons, contrastes colorés, ambiance futuriste et univers synthwave. L'exercice m'a permis de travailler la mise en scène du produit, l'ambiance visuelle et le rythme.",
+      "en": "The goal was to design an advertisement for a pair of headphones while adhering to a specific artistic direction. I chose a Retro Wave aesthetic, inspired by the 1980s, combining neon lights, bold color contrasts, a futuristic vibe, and a synthwave feel. This exercise allowed me to work on the product’s presentation, the visual atmosphere, and the pacing."
+    },
+    "contributions": [],
+    "technicalNotes": {
+      "fr": "",
+      "en": ""
+    },
+    "software": [
+      "After Effects",
+      "Illustrator",
+      "Blender"
+    ],
+    "credits": [],
+    "collaborator": null,
+    "featured": false,
+    "visible": true,
+    "gallery": [
+      {
+        "src": "assets/images/projects/pub-casque/still-01.jpg",
+        "alt": {
+          "fr": "Image du projet — PUB CASQUE",
+          "en": "Project still — PUB CASQUE"
+        },
+        "caption": {
+          "fr": "MoodBoard - préprod",
+          "en": "MoodBoard - Pre-production"
+        }
+      },
+      {
+        "src": "assets/images/projects/pub-casque/capture-01.png",
+        "alt": {
+          "fr": "Capture technique — PUB CASQUE",
+          "en": "Technical capture — PUB CASQUE"
+        },
+        "caption": {
+          "fr": "Réalisé sur After Effect",
+          "en": "Created in After Effects"
+        }
+      }
+    ],
+    "thumbnail": "assets/images/projects/pub-casque/cover.png",
+    "hero": "assets/images/projects/pub-casque/cover.png",
+    "thumbnailAlt": {
+      "fr": "Image principale — PUB CASQUE",
+      "en": "Project cover — PUB CASQUE"
+    },
+    "heroAlt": {
+      "fr": "Image principale — PUB CASQUE",
+      "en": "Project cover — PUB CASQUE"
+    },
+    "videos": [
+      {
+        "type": "youtube",
+        "src": "https://youtu.be/pDrfivO4EHE",
+        "videoId": "pDrfivO4EHE",
+        "mediaCategory": "film",
+        "title": {
+          "fr": "Extrait YouTube du projet",
+          "en": "YouTube project excerpt"
+        }
+      }
+    ],
+    "includeInCV": false
+  },
+  {
+    "id": "matte-painting",
+    "code": "06",
+    "title": "MATTE PAINTING",
+    "titleEN": "",
+    "year": "2026",
+    "order": 6,
+    "cvPriority": 10,
+    "type": "exercise",
+    "status": "completed",
+    "categories": [
+      "vfx",
+      "compositing",
+      "matte-painting"
+    ],
+    "role": {
+      "fr": "",
+      "en": ""
+    },
+    "roleDescription": {
+      "fr": "",
+      "en": ""
+    },
+    "shortDescription": {
+      "fr": "L'objectif de cet exercice était de découvrir les principes du matte painting et de comprendre les enjeux de l'intégration d'éléments visuels dans un environnement existant.\nIl s'agissait de créer un décor cohérent en travaillant sur la perspective, la lumière, les couleurs et la profondeur de l'image.\nL'exercice permettait d'appréhender les techniques nécessaires pour rendre crédible l'intégration d'éléments ajoutés à une prise de vue.\nUne première approche du compositing, visant à renforcer la cohérence visuelle et le réalisme d'une image.",
+      "en": "The goal of this exercise was to explore the principles of matte painting and to understand the challenges of integrating visual elements into an existing environment.\nThe objective was to create a coherent scene by working on perspective, lighting, colors, and depth.\nThe exercise helped students grasp the techniques needed to make the integration of added elements into a shot look believable.\nAn introduction to compositing, aimed at enhancing the visual coherence and realism of an image."
+    },
+    "description": {
+      "fr": "L'objectif de cet exercice était de découvrir les principes du matte painting et de comprendre les enjeux de l'intégration d'éléments visuels dans un environnement existant.\nIl s'agissait de créer un décor cohérent en travaillant sur la perspective, la lumière, les couleurs et la profondeur de l'image.\nL'exercice permettait d'appréhender les techniques nécessaires pour rendre crédible l'intégration d'éléments ajoutés à une prise de vue.\nUne première approche du compositing, visant à renforcer la cohérence visuelle et le réalisme d'une image.",
+      "en": "The goal of this exercise was to explore the principles of matte painting and to understand the challenges of integrating visual elements into an existing environment.\nThe objective was to create a coherent scene by working on perspective, lighting, colors, and depth.\nThe exercise helped students grasp the techniques needed to make the integration of added elements into a shot look believable.\nAn introduction to compositing, aimed at enhancing the visual coherence and realism of an image."
+    },
+    "contributions": [],
+    "technicalNotes": {
+      "fr": "",
+      "en": ""
+    },
+    "software": [
+      "After Effects",
+      "Photoshop",
+      "Illustrator",
+      "Blender"
+    ],
+    "credits": [],
+    "collaborator": null,
+    "featured": false,
+    "visible": true,
+    "includeInCV": false,
+    "videos": [
+      {
+        "type": "youtube",
+        "src": "https://youtu.be/EAXmtMFGJlQ",
+        "videoId": "EAXmtMFGJlQ",
+        "mediaCategory": "breakdown",
+        "title": {
+          "fr": "Breakdown YouTube",
+          "en": "YouTube breakdown"
+        }
+      },
+      {
+        "type": "youtube",
+        "src": "https://youtu.be/v_mM5Ia7LEQ",
+        "videoId": "v_mM5Ia7LEQ",
+        "mediaCategory": "film",
+        "title": {
+          "fr": "Extrait YouTube du projet",
+          "en": "YouTube project excerpt"
+        }
+      }
+    ],
+    "thumbnail": "assets/images/projects/matte-painting/cover.png",
+    "hero": "assets/images/projects/matte-painting/cover.png",
+    "thumbnailAlt": {
+      "fr": "Image principale — MATTE PAINTING",
+      "en": "Project cover — MATTE PAINTING"
+    },
+    "heroAlt": {
+      "fr": "Image principale — MATTE PAINTING",
+      "en": "Project cover — MATTE PAINTING"
+    },
+    "comparisons": [
+      {
+        "label": {
+          "fr": "Avant / après",
+          "en": "Before / after"
+        },
+        "before": "assets/images/projects/matte-painting/before-after-01-before.png",
+        "after": "assets/images/projects/matte-painting/before-after-01-after.png"
+      }
+    ]
   }
 ];
 window.SOFTWARE_CATALOG = [

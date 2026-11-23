@@ -1,16 +1,16 @@
-Optimiser le CV pour qu'il soit beuacoup plus compacte... 1 page maximum.. 
-Dans cet ordre : 
-1. moyen de contacte 
-2. NOM
-3. "recherche d'opportunité ... 
-4. Profil
-5. formation 
-6. Projet 
-7. Expérience pro (plus compacte au niveau des lignes)
-
 
 Dans la gestion locale : 
 Pour la création de projet le menu 03 Before / After 
 Il faudrais que ça soit plus claire quand on ajoute des images laquel va avec laquel... 
 
 Dans l'onglet à propos il y a la case logiciel qui reste vide. Mais fait en sorte que si elle est validé par un proejt on ajoute le logo du logiciel... 
+
+Il faudrais que dans la gestion local onglet à propos on puisse soit importer soit mettre le lien youtube du showreel... 
+Egalement il y a ce texte d'affiché "La liste des logiciels sera complétée prochainement." alors qu'il y des logiciels d'afficher...  
+D'ailleurs quand on sélectionne les logiciels il serait bien de les afficher dans la barre latérale gauche de la fenêtre du projet... 
+Dans l'onglet contact il faudrait ajouter mon numéro de téléphone 06.49.00.21.90 
+
+Revoir l'interface mobile / tablette car il y a des bugs d'affichage... 
+
+Dans la création de projet il faudrais également un bouton matte painting 
+

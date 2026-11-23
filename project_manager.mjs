@@ -107,6 +107,17 @@ async function uploadHomeImage(payload) {
   await writeFile(full, bytes);
   return { ok: true, path: path.relative(ROOT, full).replaceAll("\\", "/"), size: bytes.length };
 }
+async function uploadShowreel(payload) {
+  const ext = path.extname(path.basename(String(payload.filename || ""))).toLowerCase();
+  if (![".mp4", ".webm", ".mov"].includes(ext)) throw new Error("Choisis une vidéo MP4, WebM ou MOV.");
+  const bytes = Buffer.from(String(payload.data || ""), "base64");
+  if (!bytes.length || bytes.length > MAX_FILE) throw new Error("Fichier vide ou supérieur à 1 Go.");
+  const folder = path.join(ROOT, "assets", "videos", "showreel");
+  await mkdir(folder, { recursive: true });
+  const full = path.join(folder, `showreel${ext}`);
+  await writeFile(full, bytes);
+  return { ok: true, path: path.relative(ROOT, full).replaceAll("\\", "/"), size: bytes.length };
+}
 async function removeMedia(payload) {
   const relative = String(payload.path || "").replaceAll("\\", "/");
   const normalized = path.posix.normalize(relative);
@@ -203,6 +214,7 @@ async function serve(req, res) {
       const payload = await body(req);
       if (url.pathname === "/api/save") { await writeData(payload); queuePdfGeneration(); json(res, 200, { ok: true }); return; }
       if (url.pathname === "/api/upload-home-image") { json(res, 200, await uploadHomeImage(payload)); return; }
+      if (url.pathname === "/api/upload-showreel") { json(res, 200, await uploadShowreel(payload)); return; }
       if (url.pathname === "/api/remove-media") { json(res, 200, await removeMedia(payload)); return; }
       if (url.pathname === "/api/upload") { json(res, 200, await upload(payload)); return; }
       json(res, 404, { error: "Route inconnue." }); return;

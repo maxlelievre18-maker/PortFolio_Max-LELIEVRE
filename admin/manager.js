@@ -222,6 +222,12 @@
     const item = document.createElement("div");
     item.className = "media-preview-item";
     item.dataset.mediaPath = path;
+    if (captionTarget?.kind === "comparison-before" || captionTarget?.kind === "comparison-after") {
+      const badge = document.createElement("strong");
+      badge.className = "media-pair-label";
+      badge.textContent = (captionTarget.kind === "comparison-before" ? "AVANT" : "APRÈS") + " · PAIRE " + (Number(captionTarget.index) + 1);
+      item.appendChild(badge);
+    }
     const element = document.createElement(videoId ? "iframe" : video ? "video" : "img");
     if (videoId) {
       element.src = "https://www.youtube-nocookie.com/embed/" + videoId;
@@ -293,6 +299,11 @@
     set("experienceDescriptionFR", textFor(experience.description, "fr")); set("experienceDescriptionEN", textFor(experience.description, "en"));
     set("experienceSkillsFR", (experience.skillsDeveloped?.fr || []).join("\n")); set("experienceSkillsEN", (experience.skillsDeveloped?.en || []).join("\n"));
     siteForm.elements.namedItem("backgroundEffects").checked = site.backgroundEffects !== false;
+    const reel = site.showreel || {};
+    const reelUrl = siteForm.elements.namedItem("showreelUrl");
+    if (reelUrl) reelUrl.value = reel.embed || "";
+    const reelResult = $("[data-showreel-result]");
+    if (reelResult) reelResult.textContent = reel.file ? "Vidéo actuelle : " + reel.file : "Aucun fichier importé.";
   }
   function setCVForm() {
     if (!cvForm || !state.data) return;
@@ -524,8 +535,28 @@
     })) };
     site.experience = [{ employer: value("experienceEmployer"), role: { fr: value("experienceRoleFR"), en: value("experienceRoleEN") }, period: { fr: value("experiencePeriodFR"), en: value("experiencePeriodEN") }, description: { fr: value("experienceDescriptionFR"), en: value("experienceDescriptionEN") }, skillsDeveloped: { fr: lines(value("experienceSkillsFR")), en: lines(value("experienceSkillsEN")) } }].filter(item => item.employer);
     site.backgroundEffects = siteForm.elements.namedItem("backgroundEffects").checked;
+    site.showreel ||= {};
+    const reelUrl = value("showreelUrl");
+    const reelId = youtubeVideoId(reelUrl);
+    if (reelUrl && !reelId) { flash("Lien YouTube de showreel invalide.", true); return; }
+    site.showreel.embed = reelId ? "https://www.youtube-nocookie.com/embed/" + reelId : "";
     try { await request("/api/save", state.data); flash("Page À propos, expérience et fond enregistrés. Recharge le site pour afficher les changements."); }
     catch (error) { flash(error.message, true); }
+  });
+  if (siteForm) siteForm.addEventListener("change", async event => {
+    const input = event.target.closest('[name="showreelFile"]');
+    if (!input?.files?.length) return;
+    const file = input.files[0];
+    try {
+      const result = await request("/api/upload-showreel", { filename: file.name, data: await dataUrl(file) });
+      state.data.SITE.showreel ||= {};
+      state.data.SITE.showreel.file = result.path;
+      await request("/api/save", state.data);
+      const label = $("[data-showreel-result]");
+      if (label) label.textContent = "Vidéo importée : " + result.path;
+      flash("Showreel importé et enregistré.");
+    } catch (error) { flash(error.message, true); }
+    finally { input.value = ""; }
   });
   form.addEventListener("submit", async event => {
     event.preventDefault();

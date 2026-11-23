@@ -462,6 +462,7 @@ body {
   display:none
 }
 .media-preview-item { display:grid; align-content:start; gap:6px; min-width:0; }
+.media-pair-label { color:var(--blue); font-size:9px; letter-spacing:.08em; }
 .media-preview img,.media-preview video {
   width:96px;
   height:54px;
@@ -635,6 +636,25 @@ code {
   .pair-inputs {
     grid-template-columns:1fr
   }
+}
+@media (min-width:741px) and (max-width:1100px) {
+  .admin-layout { grid-template-columns:210px minmax(0,1fr); }
+  .editor { padding:20px; }
+  .admin-tabs { gap:6px; }
+  .admin-tab { padding:0 9px; font-size:9px; }
+  .pair-inputs { grid-template-columns:1fr; }
+}
+@media(max-width:740px) {
+  .admin-header { flex-wrap:wrap; padding:12px 16px; }
+  .admin-header__actions { flex-direction:row; align-items:center; flex-wrap:wrap; }
+  .library { padding:20px 16px; }
+  .project-entry { grid-template-columns:minmax(0,1fr); }
+  .project-entry__flag { justify-self:start; }
+  .site-settings { padding:22px 16px 30px; }
+  .save-bar { position:static; flex-wrap:wrap; margin-top:20px; }
+  .save-bar>span { max-width:none; }
+  .admin-tabs { overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; }
+  .admin-tab { flex:0 0 auto; }
 }
 
 .video-source-options { display:grid; gap:10px; margin-bottom:10px; }

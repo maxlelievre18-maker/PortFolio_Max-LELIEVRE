@@ -1595,6 +1595,9 @@ video.video-frame__el {
   font-size: 0.9rem;
   line-height: 1.45;
 }
+.project-meta__software { display:flex; flex-wrap:wrap; gap:.45rem; }
+.project-meta__software-item { display:inline-flex; align-items:center; gap:.35rem; min-width:0; }
+.project-meta__software-item img { width:22px; height:22px; padding:2px; background:#fff; object-fit:contain; }
 
 .project-hero-media {
   margin-top: clamp(2rem, 4vw, 4rem);

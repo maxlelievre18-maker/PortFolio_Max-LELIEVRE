@@ -1148,7 +1148,7 @@
       role ? metaItem(t("project.role"), role) : "",
       categories.length ? metaItem(t("project.categories"), categories.join(" · ")) : "",
       type ? metaItem(t("project.type"), type) : "",
-      software.length ? metaItem(t("project.software"), software.join(" · ")) : ""
+      software.length ? '<div class="project-meta__item"><dt class="project-meta__label">' + esc(t("project.software")) + '</dt><dd class="project-meta__value project-meta__software">' + software.map(function (name) { var item = SOFTWARE_CATALOG.find(function (entry) { return entry.name === name; }); return item ? '<span class="project-meta__software-item"><img src="/' + esc(item.logo) + '" alt="" loading="lazy"><span>' + esc(name) + '</span></span>' : ''; }).join("") + '</dd></div>' : ""
     ].filter(Boolean).join("");
 
     const sections = [];
@@ -1421,7 +1421,6 @@
             (software.length
               ? '<div class="software-logo-list">' + softwareMarks(software, "about") + '</div>'
               : '<p class="about-note">' + esc(t("common.toBeCompleted")) + '</p>') +
-            '<p class="about-note">' + esc(t("about.softwareNote")) + '</p>' +
           '</section>' +
           '<section class="cv-panel" data-reveal aria-labelledby="cv-title">' +
             '<div class="cv-panel__content">' +
@@ -1514,9 +1513,13 @@
      ---------------------------------------------------------- */
   function renderContactPage() {
     const email = SITE.email || "";
+    const phone = String(SITE.phone || "").trim();
+    const phoneDigits = phone.replace(/\D/g, "");
+    const phoneHref = phoneDigits ? "tel:" + (phoneDigits.startsWith("0") ? "+33" + phoneDigits.slice(1) : "+" + phoneDigits) : "";
     return '<section class="page-hero" aria-labelledby="contact-title"><div class="container"><p class="eyebrow">' + esc(t("contact.eyebrow")) + '</p><h1 class="page-title" id="contact-title">' + esc(t("contact.title")) + '</h1><p class="page-intro page-intro--large">' + esc(t("contact.intro")) + '</p></div></section>' +
       '<section class="container contact-profiles" aria-label="' + esc(t("contact.title")) + '" data-reveal>' +
         contactProfileCard("email", t("contact.emailLabel"), email) +
+        (phone ? contactProfileLink("phone", t("contact.phoneLabel"), phoneHref, phone) : "") +
         (SITE.linkedin ? contactProfileLink("linkedin", t("contact.linkedinLabel"), SITE.linkedin, SITE.name) : "") +
         (SITE.youtube ? contactProfileLink("youtube", t("contact.youtubeLabel"), SITE.youtube, SITE.name) : "") +
       '</section>' +
