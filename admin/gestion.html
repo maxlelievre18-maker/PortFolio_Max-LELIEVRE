@@ -82,6 +82,7 @@
           <section class="language-column" aria-labelledby="home-fr-title"><h3 id="home-fr-title">Français</h3><label class="field"><span>Description de l’accueil</span><textarea name="homeIntroFR" rows="5"></textarea></label><label class="field"><span>Phrase de conclusion · approche</span><textarea name="homeStatementFR" rows="3"></textarea></label></section>
           <section class="language-column" aria-labelledby="home-en-title"><h3 id="home-en-title">English</h3><label class="field"><span>Home description</span><textarea name="homeIntroEN" rows="5"></textarea></label><label class="field"><span>Closing statement · approach</span><textarea name="homeStatementEN" rows="3"></textarea></label></section>
         </div>
+        <fieldset class="field field--wide software-field"><legend>Logiciels visibles <small>Cette sélection est utilisée à l’identique sur l’accueil et la page À propos.</small></legend><div id="site-software-picker" class="software-picker"><span class="muted">Chargement des logos…</span></div></fieldset>
         <div class="save-bar"><span>Les textes et l’image sont enregistrés dans les données locales du portfolio.</span><button class="button button--blue" type="submit">Enregistrer la page d’accueil</button></div>
       </form>
     </section>
@@ -110,7 +111,15 @@
         </div>
         <fieldset class="experience-editor"><legend>Employeur</legend><label class="field"><span>Nom de l’employeur</span><input name="experienceEmployer"></label></fieldset>
         <fieldset class="experience-editor"><legend>Showreel et breakdown</legend><div class="form-grid"><label class="field field--wide"><span>Lien YouTube du showreel <small>URL youtube.com, youtu.be ou Shorts</small></span><input name="showreelUrl" type="url" placeholder="https://www.youtube.com/watch?v=..."></label><label class="field field--wide"><span>Lien YouTube du breakdown <small>Vidéo de présentation des étapes ou des plans du showreel</small></span><input name="breakdownUrl" type="url" placeholder="https://www.youtube.com/watch?v=..."></label><label class="field field--wide"><span>Ou importer le showreel (MP4, WebM ou MOV)</span><input name="showreelFile" type="file" accept="video/mp4,video/webm,video/quicktime"><small data-showreel-result></small></label></div></fieldset>
-        <label class="site-toggle"><input name="backgroundEffects" type="checkbox"> Afficher les motifs graphiques subtils dans le fond du site</label>
+        <fieldset class="experience-editor"><legend>Apparence du site</legend>
+          <p class="muted">Réglages réservés à la gestion locale : les visiteurs ne voient aucun sélecteur et ne peuvent pas modifier l’apparence du site.</p>
+          <div class="form-grid">
+            <label class="field"><span>Thème</span><select name="theme"><option value="blue">Bleu — thème d’origine</option><option value="dark">Sombre</option><option value="light">Clair</option></select></label>
+            <label class="field"><span>Fond par défaut</span><select name="backgroundStyle"><option value="deep-space">Deep Space</option><option value="nebula">Nebula</option><option value="horizon">Horizon</option><option value="orbital">Orbital System</option><option value="topographic">Topographic</option><option value="hud">HUD Interface</option><option value="streaks">Light Streaks</option><option value="minimal">Minimal</option></select></label>
+          </div>
+          <label class="site-toggle"><input name="backgroundEffects" type="checkbox"> Afficher les fonds animés <small>Décoche pour masquer complètement le fond décoratif.</small></label>
+          <label class="site-toggle"><input name="backgroundMotion" type="checkbox"> Animer les fonds <small>Décoche pour figer les animations tout en conservant le fond.</small></label>
+        </fieldset>
         <div class="save-bar"><span>Les modifications sont enregistrées dans les données du portfolio.</span><button class="button button--blue" type="submit">Enregistrer la page À propos</button></div>
       </form>
     </section>

@@ -116,6 +116,14 @@
       '<label class="software-choice"><input type="checkbox" name="software" value="' + esc(item.name) + '"' + (selected.includes(item.name) ? ' checked' : '') + '><img src="' + esc(assetUrl(item.logo)) + '" alt="" loading="lazy"><span>' + esc(item.name) + '</span></label>'
     ).join("") : '<span class="muted">Aucun logo disponible dans le catalogue des logiciels.</span>';
   }
+  function renderSiteSoftwarePicker(selected = []) {
+    const picker = $("#site-software-picker");
+    if (!picker) return;
+    const catalog = state.data.SOFTWARE_CATALOG || [];
+    picker.innerHTML = catalog.length ? catalog.map(item =>
+      '<label class="software-choice"><input type="checkbox" name="siteSoftware" value="' + esc(item.name) + '"' + (selected.includes(item.name) ? ' checked' : '') + '><img src="' + esc(assetUrl(item.logo)) + '" alt="" loading="lazy"><span>' + esc(item.name) + '</span></label>'
+    ).join("") : '<span class="muted">Aucun logo disponible dans le catalogue des logiciels.</span>';
+  }
   function val(name, value) {
     const control = form.elements.namedItem(name);
     if (control) control.value = value ?? "";
@@ -309,6 +317,9 @@
     set("experienceDescriptionFR", textFor(experience.description, "fr")); set("experienceDescriptionEN", textFor(experience.description, "en"));
     set("experienceSkillsFR", (experience.skillsDeveloped?.fr || []).join("\n")); set("experienceSkillsEN", (experience.skillsDeveloped?.en || []).join("\n"));
     siteForm.elements.namedItem("backgroundEffects").checked = site.backgroundEffects !== false;
+    siteForm.elements.namedItem("backgroundMotion").checked = site.backgroundMotion !== false;
+    set("backgroundStyle", site.backgroundStyle || "deep-space");
+    set("theme", site.theme || "blue");
     const reel = site.showreel || {};
     const reelUrl = siteForm.elements.namedItem("showreelUrl");
     if (reelUrl) reelUrl.value = reel.embed || "";
@@ -342,6 +353,7 @@
     const set = (name, value) => { const field = homeForm.elements.namedItem(name); if (field) field.value = value ?? ""; };
     set("homeIntroFR", textFor(home.intro, "fr")); set("homeIntroEN", textFor(home.intro, "en"));
     set("homeStatementFR", textFor(home.statement, "fr")); set("homeStatementEN", textFor(home.statement, "en"));
+    renderSiteSoftwarePicker(state.data.SITE.software || []);
     const preview = $("[data-home-preview]");
     preview.replaceChildren();
     if (state.data.SITE.heroImage) addPreview(preview, state.data.SITE.heroImage);
@@ -360,6 +372,7 @@
     const site = state.data.SITE;
     const value = name => homeForm.elements.namedItem(name).value.trim();
     site.home = { intro: { fr: value("homeIntroFR"), en: value("homeIntroEN") }, statement: { fr: value("homeStatementFR"), en: value("homeStatementEN") } };
+    site.software = $$('input[name="siteSoftware"]:checked', homeForm).map(input => input.value);
     try { await request("/api/save", state.data); flash("Page d’accueil enregistrée."); }
     catch (error) { flash(error.message, true); }
   });
@@ -547,6 +560,9 @@
     })) };
     site.experience = [{ employer: value("experienceEmployer"), role: { fr: value("experienceRoleFR"), en: value("experienceRoleEN") }, period: { fr: value("experiencePeriodFR"), en: value("experiencePeriodEN") }, description: { fr: value("experienceDescriptionFR"), en: value("experienceDescriptionEN") }, skillsDeveloped: { fr: lines(value("experienceSkillsFR")), en: lines(value("experienceSkillsEN")) } }].filter(item => item.employer);
     site.backgroundEffects = siteForm.elements.namedItem("backgroundEffects").checked;
+    site.backgroundMotion = siteForm.elements.namedItem("backgroundMotion").checked;
+    site.backgroundStyle = value("backgroundStyle") || "deep-space";
+    site.theme = ["blue", "dark", "light"].includes(value("theme")) ? value("theme") : "blue";
     site.showreel ||= {};
     const reelUrl = value("showreelUrl");
     const reelId = youtubeVideoId(reelUrl);
@@ -556,7 +572,7 @@
     if (breakdownUrl && !breakdownId) { flash("Lien YouTube de breakdown invalide.", true); return; }
     site.showreel.embed = reelId ? "https://www.youtube-nocookie.com/embed/" + reelId : "";
     site.showreel.breakdownEmbed = breakdownId ? "https://www.youtube-nocookie.com/embed/" + breakdownId : "";
-    try { await request("/api/save", state.data); flash("Page À propos, expérience et fond enregistrés. Recharge le site pour afficher les changements."); }
+    try { await request("/api/save", state.data); flash("Page À propos, expérience et apparence enregistrées. Recharge le site pour afficher les changements."); }
     catch (error) { flash(error.message, true); }
   });
   if (siteForm) siteForm.addEventListener("change", async event => {

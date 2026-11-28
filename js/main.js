@@ -17,6 +17,8 @@
 
   const DEFAULT_LANG = "fr";
   const STORAGE_KEY = "max-lelievre-lang";
+  const THEME_STORAGE_KEY = "max-lelievre-theme";
+  const THEMES = ["blue", "light", "dark"];
   const REDUCED = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const SITE = Object.assign({
@@ -39,8 +41,19 @@
     breakdown: []
   }, RAW_SITE.showreel || {});
 
+  const BACKGROUNDS = ["deep-space", "nebula", "horizon", "orbital", "topographic", "hud", "streaks", "minimal"];
+
+  const THEME_COLORS = {
+    blue: "#0B1E2A",
+    dark: "#101112",
+    light: "#EDF2F5"
+  };
+
   const state = {
     lang: readLang(),
+    theme: readTheme(),
+    background: readBackground(),
+    animationsEnabled: readAnimationsEnabled(),
     filter: "all",
     route: { name: "home" },
     menuOpen: false,
@@ -72,6 +85,24 @@
       if (saved === "fr" || saved === "en") return saved;
     } catch (error) { /* stockage indisponible */ }
     return DEFAULT_LANG;
+  }
+
+  function readTheme() {
+    try {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY);
+      if (THEMES.indexOf(saved) !== -1) return saved;
+    } catch (error) { /* stockage indisponible */ }
+    const theme = SITE.theme;
+    return THEMES.indexOf(theme) !== -1 ? theme : "blue";
+  }
+
+  function readBackground() {
+    const background = SITE.backgroundStyle;
+    return BACKGROUNDS.indexOf(background) !== -1 ? background : "deep-space";
+  }
+
+  function readAnimationsEnabled() {
+    return SITE.backgroundMotion !== false;
   }
 
   function getPath(object, path) {
@@ -256,12 +287,45 @@
     '</div>';
   }
 
+  function themeName(theme) {
+    return t("common.theme" + theme.charAt(0).toUpperCase() + theme.slice(1));
+  }
+
+  function themeSwitcher(modifier) {
+    return '<div class="theme-switch ' + (modifier || "") + '" role="group" aria-label="' + esc(t("common.themeGroup")) + '">' +
+      THEMES.map(function (theme) {
+        const active = state.theme === theme;
+        return '<button class="theme-switch__btn' + (active ? " is-active" : "") + '" type="button" data-theme-choice="' + theme +
+          '" aria-pressed="' + active + '" aria-label="' + esc(themeName(theme)) + '" title="' + esc(themeName(theme)) + '">' +
+          '<span class="theme-switch__swatch theme-switch__swatch--' + theme + '" aria-hidden="true"></span>' +
+          '<span class="theme-switch__name" aria-hidden="true">' + esc(themeName(theme)) + '</span>' +
+        '</button>';
+      }).join("") +
+    '</div>';
+  }
+
+  function applyTheme() {
+    document.documentElement.dataset.theme = state.theme;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", THEME_COLORS[state.theme] || THEME_COLORS.blue);
+    const scheme = document.querySelector('meta[name="color-scheme"]');
+    if (scheme) scheme.setAttribute("content", state.theme === "light" ? "light" : "dark");
+  }
+
+  function applyAppearance() {
+    const enabled = SITE.backgroundEffects !== false && state.background !== "minimal";
+    document.body.classList.toggle("has-background-art", enabled);
+    document.body.dataset.background = state.background;
+    document.body.dataset.backgroundMotion = state.animationsEnabled && !REDUCED() ? "on" : "off";
+  }
+
   function contactAction(className) {
     return '<a class="' + className + '" href="#/contact">' + esc(t("nav.contact")) + '<span aria-hidden="true">→</span></a>';
   }
 
   function renderShell() {
-    document.body.classList.toggle("has-background-art", SITE.backgroundEffects !== false);
+    applyTheme();
+    applyAppearance();
     const header = $("#site-header");
     if (header) {
       header.innerHTML =
@@ -276,6 +340,7 @@
           '</nav>' +
           '<div class="header__actions">' +
             langSwitcher("lang-switch--header") +
+            themeSwitcher("theme-switch--header") +
             '<button class="menu-toggle" type="button" data-menu-toggle aria-expanded="' + state.menuOpen +
               '" aria-controls="mobile-menu" aria-label="' + esc(state.menuOpen ? t("common.closeMenu") : t("common.openMenu")) + '">' +
               '<span class="menu-toggle__label">' + esc(t("common.menu")) + '</span>' +
@@ -304,6 +369,10 @@
             '<div class="mobile-menu__row">' +
               '<span class="mobile-menu__kicker">' + esc(t("common.language")) + '</span>' +
               langSwitcher("lang-switch--menu") +
+            '</div>' +
+            '<div class="mobile-menu__row mobile-menu__row--theme">' +
+              '<span class="mobile-menu__kicker">' + esc(t("common.theme")) + '</span>' +
+              themeSwitcher("theme-switch--menu") +
             '</div>' +
             '<div class="mobile-menu__row">' +
               '<span class="mobile-menu__kicker">' + esc(t("footer.location")) + '</span>' +
@@ -362,6 +431,7 @@
     if (lightbox) lightbox.setAttribute("aria-label", t("project.gallery"));
 
     document.documentElement.lang = state.lang;
+    document.documentElement.dataset.theme = state.theme;
   }
 
   function socialLink(label, url) {
@@ -407,6 +477,22 @@
     if (wasMenuOpen) setMenu(true);
     window.scrollTo(0, scrollPosition);
     announce(lang === "fr" ? "Langue : français" : "Language: English");
+  }
+
+  /* ----------------------------------------------------------
+     THÈME
+     ---------------------------------------------------------- */
+  function setTheme(theme) {
+    if (THEMES.indexOf(theme) === -1 || theme === state.theme) return;
+    state.theme = theme;
+    try { localStorage.setItem(THEME_STORAGE_KEY, theme); } catch (error) { /* stockage indisponible */ }
+    applyTheme();
+    $$("[data-theme-choice]").forEach(function (button) {
+      const active = button.getAttribute("data-theme-choice") === theme;
+      button.classList.toggle("is-active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    announce(t("common.themeAnnounce", { theme: themeName(theme) }));
   }
 
   /* ----------------------------------------------------------
@@ -537,7 +623,28 @@
 
     window.addEventListener("scroll", updateHeader, { passive: true });
 
+    // Le routage est traité dès la phase de capture : un clic gauche sur un lien
+    // interne reste donc fiable, même si un contrôle voisin gère aussi les clics.
     document.addEventListener("click", function (event) {
+      if (event.button !== 0) return;
+      const hashLink = event.target.closest('a[href^="#/"]');
+      if (!hashLink) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const destination = hashLink.getAttribute("href");
+      if (state.menuOpen) setMenu(false);
+      if (window.location.hash === destination) renderRoute();
+      else window.location.hash = destination;
+    }, true);
+
+    document.addEventListener("click", function (event) {
+      const themeButton = event.target.closest("[data-theme-choice]");
+      if (themeButton) {
+        event.preventDefault();
+        setTheme(themeButton.getAttribute("data-theme-choice"));
+        return;
+      }
+
       const langButton = event.target.closest("[data-lang]");
       if (langButton) {
         event.preventDefault();
@@ -603,9 +710,14 @@
         return;
       }
 
-      const hashLink = event.target.closest('a[href^="#/"]');
-      if (hashLink && state.menuOpen) setMenu(false);
     });
+
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (typeof motionQuery.addEventListener === "function") {
+      motionQuery.addEventListener("change", applyAppearance);
+    } else if (typeof motionQuery.addListener === "function") {
+      motionQuery.addListener(applyAppearance);
+    }
 
     document.addEventListener("submit", function (event) {
       const form = event.target.closest("[data-contact-form]");
@@ -744,6 +856,7 @@
   function renderHome() {
     const featured = featuredProjects();
     const additional = additionalProjects();
+    const homeSoftware = (SITE.software || []).filter(function (name) { return SOFTWARE_CATALOG.some(function (item) { return item.name === name && item.logo; }); });
 
     return '<section class="hero" aria-labelledby="hero-title">' +
         '<div class="hero__bg" aria-hidden="true"></div>' +
@@ -758,8 +871,9 @@
                 '<span class="hero__line hero__line--1">' + esc(t("home.titleLine1")) + '</span>' +
                 '<span class="hero__line hero__line--2">' + esc(t("home.titleLine2")) + '</span>' +
               '</h1>' +
-              '<p class="hero__role"><span>' + esc(t("home.role")) + '</span><span class="hero__role-sep" aria-hidden="true"></span><span>' + esc(t("home.discipline")) + '</span></p>' +
+              '<p class="hero__role"><span>' + esc(t("home.role")) + '</span></p>' +
               '<p class="hero__intro">' + esc(pick(SITE.home?.intro) || t("home.intro")) + '</p>' +
+              (homeSoftware.length ? '<div class="hero__software"><span class="hero__software-label">' + esc(t("home.softwareLabel")) + '</span><div class="software-logo-list software-logo-list--hero">' + softwareMarks(homeSoftware, "hero") + '</div></div>' : '') +
               '<div class="hero__actions">' +
                 '<a class="btn btn--primary" href="#/projects">' + esc(t("home.ctaProjects")) + '<span aria-hidden="true">→</span></a>' +
                 '<a class="btn btn--ghost" href="#/contact">' + esc(t("home.ctaContact")) + '</a>' +
@@ -937,10 +1051,6 @@
         '<div class="container">' +
           '<p class="eyebrow">' + esc(t("projectsPage.eyebrow")) + '</p>' +
           '<h1 class="page-title" id="projects-title">' + esc(t("projectsPage.title")) + '</h1>' +
-          '<div class="page-hero__grid">' +
-            '<p class="page-intro">' + esc(t("projectsPage.intro")) + '</p>' +
-            '<p class="page-count">' + esc(projectCountLabel(all.length)) + '</p>' +
-          '</div>' +
         '</div>' +
       '</section>' +
       '<div class="filters-bar">' +
@@ -1403,8 +1513,7 @@
     const about = SITE.about || {};
     const sections = about.sections || t("about.sections");
     const aboutIntro = pick(about.intro) || pick(SITE.bio);
-    const software = Array.from(new Set(PROJECTS.filter(function (project) { return project.visible !== false; })
-      .flatMap(function (project) { return project.software || []; })))
+    const software = (SITE.software || [])
       .filter(function (name) { return SOFTWARE_CATALOG.some(function (item) { return item.name === name && item.logo; }); });
 
     return '<section class="page-hero" aria-labelledby="about-title">' +
@@ -1525,8 +1634,9 @@
       const skills = (item.skillsDeveloped?.[lang] || []).filter(Boolean);
       return '<article class="cv-experience"><div><h3>' + esc(item.employer) + '</h3><p>' + esc(pick(item.role)) + '</p><strong>' + esc(pick(item.period)) + '</strong>' + (skills.length ? '<p class="cv-experience__skills"><strong>' + esc(labels.developed) + '</strong><br>' + skills.map(esc).join(' / ') + '</p>' : '') + '</div><p>' + esc(pick(item.description)) + '</p></article>';
     }).join("");
-    return '<div class="cv-toolbar"><a class="btn btn--ghost" href="#/">← ' + esc(labels.back) + '</a>' + langSwitcher("lang-switch--cv") + '<a class="btn btn--primary" href="output/pdf/cv-max-lelievre-' + lang + '.pdf" download="Max-Lelievre-CV-' + lang.toUpperCase() + '.pdf">' + esc(labels.download) + ' ↓</a></div>' +
-      '<article class="cv-sheet" style="--cv-section-gap:' + sectionSpacing + 'mm;--cv-project-gap:' + projectSpacing + 'mm" aria-label="CV ' + esc(SITE.name) + '"><header class="cv-header' + ((SITE.portrait || SITE.heroImage) ? ' cv-header--with-portrait' : '') + '"><div class="cv-header__main"><div class="cv-contact-box" aria-label="' + esc(t("contact.title")) + '">' + cvContacts + '</div><h1>' + esc(SITE.name.toLocaleUpperCase("fr")) + '</h1><p class="cv-headline">' + esc(pick(SITE.headline)) + '</p></div>' + ((SITE.portrait || SITE.heroImage) ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait || SITE.heroImage) + '" alt="Portrait de ' + esc(SITE.name) + '" onerror="this.hidden=true">' : '') + '</header>' +
+    const qrCode = '<a class="cv-qr" href="' + esc(portfolioUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(portfolioUrl) + '"><img src="assets/images/portfolio-qr.jpg" alt="QR code vers le portfolio de ' + esc(SITE.name) + '"><span>Portfolio</span></a>';
+    return '<div class="cv-toolbar"><a class="btn btn--ghost" href="#/">← ' + esc(labels.back) + '</a>' + langSwitcher("lang-switch--cv") + '<a class="btn btn--primary" href="' + esc(assetUrl('output/pdf/cv-max-lelievre-' + lang + '.pdf')) + '" download="Max-Lelievre-CV-' + lang.toUpperCase() + '.pdf" type="application/pdf">' + esc(labels.download) + ' ↓</a></div>' +
+      '<article class="cv-sheet" style="--cv-section-gap:' + sectionSpacing + 'mm;--cv-project-gap:' + projectSpacing + 'mm" aria-label="CV ' + esc(SITE.name) + '"><header class="cv-header cv-header--with-qr' + ((SITE.portrait || SITE.heroImage) ? ' cv-header--with-portrait' : '') + '"><div class="cv-header__main"><div class="cv-contact-box" aria-label="' + esc(t("contact.title")) + '">' + cvContacts + '</div><h1>' + esc(SITE.name.toLocaleUpperCase("fr")) + '</h1><p class="cv-headline">' + esc(pick(SITE.headline)) + '</p></div>' + qrCode + ((SITE.portrait || SITE.heroImage) ? '<img class="cv-header__portrait" src="' + esc(SITE.portrait || SITE.heroImage) + '" alt="Portrait de ' + esc(SITE.name) + '" onerror="this.hidden=true">' : '') + '</header>' +
       '<section class="cv-section"><h2>' + esc(labels.profile) + '</h2><p>' + esc(pick(SITE.cvIntro)) + '</p></section>' + educationSection + projectSection +
       (experienceSection ? '<section class="cv-section"><h2>' + esc(labels.experience) + '</h2><div class="cv-experiences">' + experienceSection + '</div></section>' : "") +
       '<footer class="cv-footer"><span>Lien de mon portfolio :</span> <a href="' + esc(portfolioUrl) + '" target="_blank" rel="noopener noreferrer">' + esc(portfolioUrl) + '</a></footer></article>';

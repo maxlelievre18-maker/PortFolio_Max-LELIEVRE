@@ -3,7 +3,7 @@ window.SITE = {
   "name": "Max Lelièvre",
   "location": "Nantes / Paris - FRANCE",
   "portrait": "",
-  "portfolioUrl": "",
+  "portfolioUrl": "https://maxlelievre18-maker.github.io/PortFolio_Max-LELIEVRE/",
   "headline": {
     "fr": "Recherche d'opportunités en VFX / Compositing",
     "en": "Seeking Opportunities in VFX / Compositing"
@@ -29,7 +29,13 @@ window.SITE = {
       }
     }
   ],
-  "software": [],
+  "software": [
+    "Nuke",
+    "After Effects",
+    "Photoshop",
+    "Premiere Pro",
+    "Illustrator"
+  ],
   "skills": [],
   "email": "maxlelievre18@gmail.com",
   "phone": "06 . 49 . 00 . 21 . 90",
@@ -47,9 +53,13 @@ window.SITE = {
     "file": "",
     "poster": "",
     "year": "",
-    "breakdown": []
+    "breakdown": [],
+    "breakdownEmbed": ""
   },
   "backgroundEffects": true,
+  "backgroundStyle": "deep-space",
+  "backgroundMotion": true,
+  "theme": "dark",
   "about": {
     "intro": {
       "fr": "Étudiant en audiovisuel à CinéCréatis Nantes, je serai diplômé à l'été 2027. Je m’intéresse particulièrement à la postproduction, au compositing et aux effets visuels. J’aime comprendre comment une image se construit, explorer les outils techniques et donner vie à des plans en veillant à leur cohérence visuelle.\n\nPassionné de cinéma et notamment de science-fiction, avec un attachement particulier à l’univers de Star Wars, je suis attiré par les images qui repoussent les limites du réel. Cette passion nourrit ma curiosité pour les techniques, les environnements et les effets qui participent à la création d’univers cinématographiques.",
@@ -95,11 +105,11 @@ window.SITE = {
         },
         "body": {
           "fr": [
-            "Sur EURYDICE, j’interviens comme VFX artist en préproduction. Les recherches, les tests et les intégrations seront présentés lorsque les images seront validées.",
+            "Sur EURYDICE, j’interviens en compositing en préproduction. Les recherches, les tests et les intégrations seront présentés lorsque les images seront validées.",
             "Ce projet me permet d’aborder les effets visuels en amont, avec une attention particulière portée à l’intégration des effets dans le plan."
           ],
           "en": [
-            "On EURYDICE, I work as a VFX artist in preproduction. Research, tests and integrations will be presented once the visuals are approved.",
+            "On EURYDICE, I work in compositing during preproduction. Research, tests and integrations will be presented once the visuals are approved.",
             "The project lets me approach visual effects early in the process, with a particular focus on how effects sit within the shot."
           ]
         }
@@ -417,8 +427,8 @@ window.PROJECTS = [
     "featured": true,
     "visible": true,
     "role": {
-      "fr": "VFX Artist",
-      "en": "VFX Artist"
+      "fr": "Compositing",
+      "en": "Compositing"
     },
     "roleDescription": {
       "fr": "",
@@ -443,6 +453,7 @@ window.PROJECTS = [
       "After Effects",
       "Photoshop",
       "Premiere Pro",
+      "Illustrator",
       "Blender"
     ],
     "thumbnail": "assets/images/projects/eurydice/cover.jpg",

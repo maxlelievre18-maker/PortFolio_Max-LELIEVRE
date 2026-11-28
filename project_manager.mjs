@@ -12,6 +12,7 @@ const PORT = 8765;
 const MAX_FILE = 1024 * 1024 * 1024;
 const DATA_FILE = path.join(ROOT, "data", "portfolio.json");
 const JS_FILE = path.join(ROOT, "js", "projects.js");
+const APPEARANCE_FILE = path.join(ROOT, "js", "appearance.js");
 const PDF_DIR = path.join(ROOT, "output", "pdf");
 let pdfTimer;
 const MEDIA = {
@@ -41,12 +42,46 @@ async function writeData(data) {
     "window.SITE = " + JSON.stringify(data.SITE, null, 2) + ";\n" +
     "window.PROJECTS = " + JSON.stringify(data.PROJECTS, null, 2) + ";\n" +
     "window.SOFTWARE_CATALOG = " + JSON.stringify(data.SOFTWARE_CATALOG || [], null, 2) + ";\n";
+  const site = data.SITE || {};
+  const themes = ["blue", "dark", "light"];
+  const backgrounds = ["deep-space", "nebula", "horizon", "orbital", "topographic", "hud", "streaks", "minimal"];
+  const theme = themes.includes(site.theme) ? site.theme : "blue";
+  const background = backgrounds.includes(site.backgroundStyle) ? site.backgroundStyle : "deep-space";
+  const appearance = "/* Fichier généré depuis data/portfolio.json avec project_manager.mjs. */\n" +
+    "(function () {\n" +
+    "  var theme = " + JSON.stringify(theme) + ";\n" +
+    "  var background = " + JSON.stringify(background) + ";\n" +
+    "  var effects = " + (site.backgroundEffects !== false) + ";\n" +
+    "  var motion = " + (site.backgroundMotion !== false) + ";\n" +
+    "  var root = document.documentElement;\n" +
+    "  var body = document.body;\n" +
+    "  var themes = " + JSON.stringify(themes) + ";\n" +
+    "  var backgrounds = " + JSON.stringify(backgrounds) + ";\n" +
+    "  try {\n" +
+    "    var stored = localStorage.getItem(\"max-lelievre-theme\");\n" +
+    "    if (themes.indexOf(stored) !== -1) theme = stored;\n" +
+    "  } catch (error) { /* stockage indisponible */ }\n" +
+    "  if (themes.indexOf(theme) === -1) theme = \"blue\";\n" +
+    "  if (backgrounds.indexOf(background) === -1) background = \"deep-space\";\n" +
+    "  var reduced = window.matchMedia && window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n" +
+    "  root.dataset.theme = theme;\n" +
+    "  body.dataset.background = background;\n" +
+    "  body.dataset.backgroundMotion = motion && !reduced ? \"on\" : \"off\";\n" +
+    "  body.classList.toggle(\"has-background-art\", effects !== false && background !== \"minimal\");\n" +
+    "  var colors = { blue: \"#0B1E2A\", dark: \"#101112\", light: \"#EDF2F5\" };\n" +
+    "  var colorScheme = document.querySelector('meta[name=\"color-scheme\"]');\n" +
+    "  if (colorScheme) colorScheme.setAttribute(\"content\", theme === \"light\" ? \"light\" : \"dark\");\n" +
+    "  var themeColor = document.querySelector('meta[name=\"theme-color\"]');\n" +
+    "  if (themeColor) themeColor.setAttribute(\"content\", colors[theme] || colors.blue);\n" +
+    "})();\n";
   await mkdir(path.dirname(DATA_FILE), { recursive: true });
   await writeFile(DATA_FILE + ".tmp", json, "utf8");
   await writeFile(JS_FILE + ".tmp", script, "utf8");
+  await writeFile(APPEARANCE_FILE + ".tmp", appearance, "utf8");
   const { rename } = await import("node:fs/promises");
   await rename(DATA_FILE + ".tmp", DATA_FILE);
   await rename(JS_FILE + ".tmp", JS_FILE);
+  await rename(APPEARANCE_FILE + ".tmp", APPEARANCE_FILE);
 }
 function json(res, status, value) {
   const body = Buffer.from(JSON.stringify(value));

@@ -13,7 +13,7 @@ window.TRANSLATIONS = {
   fr: {
     meta: {
       siteName: "Max Lelièvre",
-      homeTitle: "Max Lelièvre — VFX Artist · Compositing & Postproduction",
+      homeTitle: "Max Lelièvre — Compositing & Postproduction",
       homeDescription: "Portfolio de Max Lelièvre, étudiant en audiovisuel à CinéCréatis Nantes, spécialisé en postproduction, compositing et effets visuels.",
       projectsTitle: "Projets — Max Lelièvre",
       projectsDescription: "Projets de postproduction, VFX et compositing de Max Lelièvre : direction de postproduction, cartons-titres, cleaning et intégration.",
@@ -51,6 +51,12 @@ window.TRANSLATIONS = {
       english: "Anglais",
       switchToFr: "Afficher le site en français",
       switchToEn: "Afficher le site en anglais",
+      theme: "Thème",
+      themeGroup: "Choisir le thème",
+      themeBlue: "Bleu",
+      themeLight: "Clair",
+      themeDark: "Sombre",
+      themeAnnounce: "Thème : {theme}",
       backToTop: "Retour en haut",
       viewProject: "Voir le projet",
       viewAllProjects: "Voir tous les projets",
@@ -120,13 +126,14 @@ window.TRANSLATIONS = {
       availability: "Travail VFX — compositing · cleaning · tracking · rotoscoping · intégration 3D",
       titleLine1: "Max",
       titleLine2: "Lelièvre",
-      role: "VFX Artist",
-      discipline: "Compositing · Postproduction",
+      role: "Junior Compositing · Postproduction",
+      discipline: "",
       intro: "Étudiant en audiovisuel spécialisé en postproduction et effets visuels, je développe mon approche du compositing à travers des projets audiovisuels, des expérimentations techniques et des collaborations de production.",
       ctaProjects: "Voir les projets",
       ctaContact: "Contact",
       scroll: "Défiler",
       heroMeta: "Étudiant en audiovisuel — CinéCréatis Nantes",
+      softwareLabel: "Logiciels",
       heroCaption: "Visuel principal — emplacement réservé",
       showreelEyebrow: "Showreel",
       showreelTitle: "Showreel",
@@ -153,7 +160,6 @@ window.TRANSLATIONS = {
     projectsPage: {
       eyebrow: "Index — Projets",
       title: "Projets",
-      intro: "Une sélection de projets et de collaborations en postproduction, compositing et VFX. Chaque fiche rassemble le contexte, mon rôle et les éléments visuels disponibles.",
       countOne: "{n} projet publié",
       countMany: "{n} projets publiés",
       filtersLabel: "Filtrer les projets",
@@ -229,7 +235,7 @@ window.TRANSLATIONS = {
       title: "À propos",
       intro: "Max Lelièvre est étudiant en audiovisuel à CinéCréatis Nantes. Son travail se situe entre postproduction, compositing et effets visuels, avec une attention particulière portée à la cohérence de l'image et à la fabrication des plans.",
       identity: {
-        role: "VFX Artist",
+        role: "Compositing",
         status: "Étudiant en audiovisuel",
         school: "CinéCréatis Nantes",
         location: "Nantes et Paris, France"
@@ -252,7 +258,7 @@ window.TRANSLATIONS = {
         {
           title: "VFX & compositing",
           body: [
-            "Sur EURYDICE, j'interviens comme VFX artist en préproduction. Les recherches, les tests et les intégrations seront présentés lorsque les images seront validées.",
+            "Sur EURYDICE, j'interviens en compositing en préproduction. Les recherches, les tests et les intégrations seront présentés lorsque les images seront validées.",
             "Ce projet me permet d'aborder les effets visuels en amont, avec une attention particulière portée à l'intégration des effets dans le plan."
           ]
         }
@@ -321,7 +327,7 @@ window.TRANSLATIONS = {
   en: {
     meta: {
       siteName: "Max Lelièvre",
-      homeTitle: "Max Lelièvre — VFX Artist · Compositing & Postproduction",
+      homeTitle: "Max Lelièvre — Compositing & Postproduction",
       homeDescription: "Portfolio of Max Lelièvre, film and audiovisual student at CinéCréatis Nantes, focused on postproduction, compositing and visual effects.",
       projectsTitle: "Projects — Max Lelièvre",
       projectsDescription: "Postproduction, VFX and compositing projects by Max Lelièvre: postproduction direction, title design, cleaning and integration.",
@@ -359,6 +365,12 @@ window.TRANSLATIONS = {
       english: "English",
       switchToFr: "Display the site in French",
       switchToEn: "Display the site in English",
+      theme: "Theme",
+      themeGroup: "Choose theme",
+      themeBlue: "Blue",
+      themeLight: "Light",
+      themeDark: "Dark",
+      themeAnnounce: "Theme: {theme}",
       backToTop: "Back to top",
       viewProject: "View project",
       viewAllProjects: "View all projects",
@@ -428,13 +440,14 @@ window.TRANSLATIONS = {
       availability: "VFX work — compositing · cleaning · tracking · rotoscoping · 3D integration",
       titleLine1: "Max",
       titleLine2: "Lelièvre",
-      role: "VFX Artist",
-      discipline: "Compositing · Postproduction",
+      role: "Junior Compositing · Postproduction",
+      discipline: "",
       intro: "Film and audiovisual student focused on postproduction and visual effects, developing my compositing skills through audiovisual projects, technical experiments and production collaborations.",
       ctaProjects: "View Projects",
       ctaContact: "Contact",
       scroll: "Scroll",
       heroMeta: "Film & audiovisual student — CinéCréatis Nantes",
+      softwareLabel: "Software",
       heroCaption: "Main visual — reserved space",
       showreelEyebrow: "Showreel",
       showreelTitle: "Showreel",
@@ -461,7 +474,6 @@ window.TRANSLATIONS = {
     projectsPage: {
       eyebrow: "Index — Projects",
       title: "Projects",
-      intro: "A selection of projects and collaborations in postproduction, compositing and VFX. Each page brings together the context, my role and the available visual material.",
       countOne: "{n} project published",
       countMany: "{n} projects published",
       filtersLabel: "Filter projects",
@@ -537,7 +549,7 @@ window.TRANSLATIONS = {
       title: "About",
       intro: "Max Lelièvre is a film and audiovisual student at CinéCréatis Nantes. His work sits between postproduction, compositing and visual effects, with a particular focus on image consistency and shot construction.",
       identity: {
-        role: "VFX Artist",
+        role: "Compositing",
         status: "Film & audiovisual student",
         school: "CinéCréatis Nantes",
         location: "Nantes and Paris, France"
@@ -560,7 +572,7 @@ window.TRANSLATIONS = {
         {
           title: "VFX & compositing",
           body: [
-            "On EURYDICE, I work as a VFX artist in preproduction. Research, tests and integrations will be presented once the visuals are approved.",
+            "On EURYDICE, I work in compositing during preproduction. Research, tests and integrations will be presented once the visuals are approved.",
             "The project lets me approach visual effects early in the process, with a particular focus on how effects sit within the shot."
           ]
         }

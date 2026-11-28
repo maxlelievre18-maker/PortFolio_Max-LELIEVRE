@@ -1,66 +1,107 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Max Lelièvre — VFX Artist · Compositing &amp; Postproduction</title>
-  <meta name="description" content="Portfolio de Max Lelièvre, étudiant en audiovisuel à CinéCréatis Nantes, spécialisé en postproduction, compositing et effets visuels.">
-  <meta name="author" content="Max Lelièvre">
-  <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="theme-color" content="#0B1E2A">
-  <meta name="color-scheme" content="dark">
-
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Max Lelièvre">
-  <meta property="og:title" content="Max Lelièvre — VFX Artist · Compositing &amp; Postproduction">
-  <meta property="og:description" content="Portfolio de Max Lelièvre, étudiant en audiovisuel à CinéCréatis Nantes, spécialisé en postproduction, compositing et effets visuels.">
-  <meta property="og:locale" content="fr_FR">
-
-  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=11">
-</head>
-<body>
-  <a class="skip-link" href="#main" data-i18n-skip>Aller au contenu</a>
-
-  <header id="site-header" class="site-header"></header>
-
-  <div id="mobile-menu" class="mobile-menu" role="dialog" aria-modal="true" aria-hidden="true" inert></div>
-
-  <main id="main" class="site-main" tabindex="-1"></main>
-
-  <noscript>
-    <div class="noscript">
-      <p><strong>Ce portfolio nécessite JavaScript.</strong></p>
-      <p>Activez JavaScript dans votre navigateur pour consulter les projets. / This portfolio requires JavaScript. Please enable it to view the projects.</p>
+<!doctype html>
+<html lang="fr" data-theme="blue">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Max Lelièvre — Compositing &amp; Postproduction</title>
+    <meta
+      name="description"
+      content="Portfolio de Max Lelièvre, étudiant en audiovisuel à CinéCréatis Nantes, spécialisé en postproduction, compositing et effets visuels."
+    />
+    <meta name="author" content="Max Lelièvre" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="theme-color" content="#0B1E2A" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Max Lelièvre" />
+    <meta
+      property="og:title"
+      content="Max Lelièvre — Compositing &amp; Postproduction"
+    />
+    <meta
+      property="og:description"
+      content="Portfolio de Max Lelièvre, étudiant en audiovisuel à CinéCréatis Nantes, spécialisé en postproduction, compositing et effets visuels."
+    />
+    <meta property="og:locale" content="fr_FR" />
+    <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css?v=15" />
+  </head>
+  <body data-background="streaks" data-background-motion="on">
+    <script src="js/appearance.js"></script>
+    <a class="skip-link" href="#main" data-i18n-skip>Aller au contenu</a>
+    <div id="background-layer" class="site-background" aria-hidden="true">
+      <span class="bg-stars"></span> <span class="bg-glow"></span>
+      <span class="bg-grid"></span>
     </div>
-  </noscript>
-
-  <footer id="site-footer" class="site-footer"></footer>
-
-  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Galerie" aria-hidden="true" inert>
-    <button class="lightbox__close" type="button" data-lightbox-close aria-label="Fermer">
-      <span aria-hidden="true"></span><span aria-hidden="true"></span>
-    </button>
-    <button class="lightbox__nav lightbox__nav--prev" type="button" data-lightbox-prev aria-label="Image précédente">
-      <span aria-hidden="true">←</span>
-    </button>
-    <figure class="lightbox__figure">
-      <div class="lightbox__stage"></div>
-      <figcaption class="lightbox__caption"></figcaption>
-    </figure>
-    <button class="lightbox__nav lightbox__nav--next" type="button" data-lightbox-next aria-label="Image suivante">
-      <span aria-hidden="true">→</span>
-    </button>
-    <div class="lightbox__counter" aria-hidden="true"></div>
-  </div>
-
-  <div id="live-region" class="sr-only" aria-live="polite"></div>
-
-  <script src="js/translations.js?v=9" defer></script>
-  <script src="js/projects.js?v=9" defer></script>
-  <script src="js/main.js?v=13" defer></script>
-</body>
+    <header id="site-header" class="site-header"></header>
+    <div
+      id="mobile-menu"
+      class="mobile-menu"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      inert
+    ></div>
+    <main id="main" class="site-main" tabindex="-1"></main>
+    <noscript>
+      <div class="noscript">
+        <p><strong>Ce portfolio nécessite JavaScript.</strong></p>
+        <p>
+          Activez JavaScript dans votre navigateur pour consulter les projets. /
+          This portfolio requires JavaScript. Please enable it to view the
+          projects.
+        </p>
+      </div>
+    </noscript>
+    <footer id="site-footer" class="site-footer"></footer>
+    <div
+      id="lightbox"
+      class="lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Galerie"
+      aria-hidden="true"
+      inert
+    >
+      <button
+        class="lightbox__close"
+        type="button"
+        data-lightbox-close
+        aria-label="Fermer"
+      >
+        <span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+      <button
+        class="lightbox__nav lightbox__nav--prev"
+        type="button"
+        data-lightbox-prev
+        aria-label="Image précédente"
+      >
+        <span aria-hidden="true">←</span>
+      </button>
+      <figure class="lightbox__figure">
+        <div class="lightbox__stage"></div>
+        <figcaption class="lightbox__caption"></figcaption>
+      </figure>
+      <button
+        class="lightbox__nav lightbox__nav--next"
+        type="button"
+        data-lightbox-next
+        aria-label="Image suivante"
+      >
+        <span aria-hidden="true">→</span>
+      </button>
+      <div class="lightbox__counter" aria-hidden="true"></div>
+    </div>
+    <div id="live-region" class="sr-only" aria-live="polite"></div>
+    <script src="js/translations.js?v=12" defer></script>
+    <script src="js/projects.js?v=9" defer></script>
+    <script src="js/main.js?v=18" defer></script>
+  </body>
 </html>
